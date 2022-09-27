@@ -1,3 +1,4 @@
+import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 
 class Location extends StatefulWidget {
@@ -13,7 +14,13 @@ class _LocationState extends State<Location> {
     return Scaffold(
       backgroundColor: Colors.amber[200],
       body: SafeArea(
-        child: Text("Location"),
+        child: Column(
+          children: const <Widget>[
+            displayMap(),
+            SizedBox(height: 10),
+            Text('Location page')
+          ],
+        ),
       ),
       
     );
