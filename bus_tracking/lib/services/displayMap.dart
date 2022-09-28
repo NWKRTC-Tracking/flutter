@@ -4,7 +4,6 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
-// import 'package:latlong/latlong.dart';
 import 'package:latlong2/latlong.dart';
 
 class displayMap extends StatefulWidget {
@@ -20,19 +19,22 @@ class _displayMapState extends State<displayMap> {
     MapController _mapController = MapController();
     double _zoom = 7;
 
-    final List<LatLng> _latLngList = [
-    LatLng(13, 77.5),
-    LatLng(13.02, 77.51),
-    LatLng(13.05, 77.53),
-    LatLng(13.055, 77.54),
-    LatLng(13.059, 77.55),
-    LatLng(13.07, 77.55),
-    LatLng(13.1, 77.5342),
-    LatLng(13.12, 77.51),
-    LatLng(13.015, 77.53),
-    LatLng(13.155, 77.54),
-    LatLng(13.159, 77.55),
-    LatLng(13.17, 77.55),
+  //   final List<LatLng> _latLngList = [
+  //   LatLng(13, 77.5),
+  //   LatLng(13.02, 77.51),
+  //   LatLng(13.05, 77.53),
+  //   LatLng(13.055, 77.54),
+  //   LatLng(13.059, 77.55),
+  //   LatLng(13.07, 77.55),
+  //   LatLng(13.1, 77.5342),
+  //   LatLng(13.12, 77.51),
+  //   LatLng(13.015, 77.53),
+  //   LatLng(13.155, 77.54),
+  //   LatLng(13.159, 77.55),
+  //   LatLng(13.17, 77.55),
+  // ];
+  final List<LatLng> _latLngList = [
+    LatLng(15.518921, 74.925977)
   ];
   List<Marker> _markers = [];
 
@@ -43,7 +45,7 @@ class _displayMapState extends State<displayMap> {
               point: pointe,
               width: 60,
               height: 60,
-              builder: (context) => Icon(
+              builder: (context) => const Icon(
                 Icons.pin_drop,
                 size: 60,
                 color: Colors.blueAccent,
@@ -57,9 +59,9 @@ class _displayMapState extends State<displayMap> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('Map'),
-        ),
+        // appBar: AppBar(
+        //   title: Text('Map'),
+        // ),
         body: FlutterMap(
           mapController: _mapController,
           options: MapOptions(
@@ -85,12 +87,12 @@ class _displayMapState extends State<displayMap> {
             MarkerClusterLayerOptions(
               maxClusterRadius: 190,
               disableClusteringAtZoom: 16,
-              size: Size(50, 50),
-              fitBoundsOptions: FitBoundsOptions(
+              size: const Size(50, 50),
+              fitBoundsOptions: const FitBoundsOptions(
                 padding: EdgeInsets.all(50),
               ),
               markers: _markers,
-              polygonOptions: PolygonOptions(
+              polygonOptions: const PolygonOptions(
                   borderColor: Colors.blueAccent,
                   color: Colors.black12,
                   borderStrokeWidth: 3),
@@ -99,7 +101,7 @@ class _displayMapState extends State<displayMap> {
                 return Container(
                   alignment: Alignment.center,
                   decoration:
-                      BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
+                      const BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
                   child: Text('${markers.length}'),
                 );
               },
