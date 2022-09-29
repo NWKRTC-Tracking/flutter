@@ -40,14 +40,13 @@ class _LocationState extends State<Location> {
   void initState() {
     super.initState();
     _locationController = StreamController();
-    Timer.periodic(Duration(seconds: 10), (_) => loadLocation());
+    Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
   }
-
-  Future<void> closeStream() => _locationController.close();
 
   @override
   void dispose() {
-    closeStream();
+    print("closed");
+    _locationController.close();
     super.dispose();
   }
 
