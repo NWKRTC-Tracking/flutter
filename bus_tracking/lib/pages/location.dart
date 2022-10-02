@@ -4,34 +4,38 @@ import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
-final String url = "https://www.google.com/";
+final String url = "https://random-data-api.com/api/v2/users";
 
 class Location extends StatefulWidget {
-  const Location({Key? key}) : super(key: key);
+  Location({Key? key}) : super(key: key);
 
   @override
   State<Location> createState() => _LocationState();
-
-  
 }
 
 class _LocationState extends State<Location> {
   late StreamController _locationController;
+  double lat = 0, long = 0;
 
-  Future fetchUser() async{
+  Future fetchUser() async {
     final response = await http.get(Uri.parse(url));
 
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       return json.decode(response.body);
-    }else{
+    } else {
       print("Exception caught: Failed to get data");
     }
   }
 
-  loadLocation() async{
-    fetchUser().then((res) async{
+  loadLocation() async {
+    fetchUser().then((res) async {
       _locationController.add(res);
+      setState(() {
+        lat = 15.518832 + 0.01 * (res['id'] % 50);
+        long = 74.925252 + 0.01 * (res['id'] % 50);
+      });
+      print(lat);
+      print(long);
       return res;
     });
   }
@@ -40,7 +44,7 @@ class _LocationState extends State<Location> {
   void initState() {
     super.initState();
     _locationController = StreamController();
-    Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
+    Timer.periodic(Duration(seconds: 2), (_) => loadLocation());
   }
 
   @override
@@ -55,29 +59,33 @@ class _LocationState extends State<Location> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[800],
-        title: const Text('Bus Location'),
+        title: Text('Bus Location'),
       ),
       backgroundColor: Colors.amber[200],
       body: StreamBuilder(
-        stream: _locationController.stream,
-        builder: (context, snapshot){ 
-          if(snapshot.hasError){
-            print("Exception: ${snapshot.error}");
-          }
-          if(snapshot.hasData){
-            return SafeArea(
-              child: Column(
-                children: const <Widget>[
-                  displayMap(),
-                  SizedBox(height: 10),
-                  Text('Location page')
-                ],
-              ),
-            );
-          }
-          return Text('Loading');
-        }
-        ),     
+          stream: _locationController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              print("Exception: ${snapshot.error}");
+            }
+            if (snapshot.hasData) {
+              // print('lat');
+              // print(lat);
+              return SafeArea(
+                child: Column(
+                  children: <Widget>[
+                    displayMap(
+                      lat: lat,
+                      long: long,
+                    ),
+                    SizedBox(height: 10),
+                    // Text(lat as String)
+                  ],
+                ),
+              );
+            }
+            return Text('Loading');
+          }),
     );
   }
 }
