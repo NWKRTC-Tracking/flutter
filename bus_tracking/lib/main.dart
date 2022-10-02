@@ -7,17 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_links/uni_links.dart';
 
-
-
-
 void main() {
-  
   runApp(MaterialApp(
     initialRoute: "/",
     routes: {
-      "/" : ((context) => Home()),
-      "/location" : ((context) => Location()),
+      "/home": ((context) => Home()),
+      "/": ((context) => Location()),
     },
   ));
 }
-

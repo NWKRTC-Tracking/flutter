@@ -4,7 +4,7 @@ import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-final String url = "https://random-data-api.com/api/v2/users";
+final String url = "http://10.196.9.48:8080/api/location/arvind69/";
 
 class Location extends StatefulWidget {
   Location({Key? key}) : super(key: key);
@@ -31,8 +31,11 @@ class _LocationState extends State<Location> {
     fetchUser().then((res) async {
       _locationController.add(res);
       setState(() {
-        lat = 15.518832 + 0.01 * (res['id'] % 50);
-        long = 74.925252 + 0.01 * (res['id'] % 50);
+        // lat = 15.518832 + 0.01 * (res['id'] % 50);
+        // long = 74.925252 + 0.01 * (res['id'] % 50);
+        print(res);
+        lat = double.parse(res['latitude']);
+        long = double.parse(res['longitude']);
       });
       print(lat);
       print(long);

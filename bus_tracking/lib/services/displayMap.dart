@@ -108,8 +108,8 @@ class _displayMapState extends State<displayMap> {
             center: _latLngList.elementAt(0),
             bounds: LatLngBounds.fromPoints(_latLngList),
             zoom: _zoom,
-            onPositionChanged: (position, hasGesture) =>
-                {_mapController.move(LatLng(widget.lat, widget.long), _zoom)},
+            // onPositionChanged: (position, hasGesture) =>
+            //     {_mapController.move(LatLng(widget.lat, widget.long), _zoom)},
             plugins: [
               MarkerClusterPlugin(),
             ],
