@@ -8,12 +8,15 @@ class Location extends StatefulWidget {
 }
 
 class _LocationState extends State<Location> {
+
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.amber[200],
       body: SafeArea(
-        child: Text("Location"),
+        child: Text("location"),
       ),
       
     );
