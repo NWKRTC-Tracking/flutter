@@ -8,8 +8,36 @@ class FirstTaskHandler extends TaskHandler {
   SendPort? _sendPort;
   StreamSubscription<Location>? _streamSubscription;
 
+  Future<bool> _checkAndRequestPermission({bool? background}) async {
+    if (!await FlLocation.isLocationServicesEnabled) {
+      // Location services are disabled.
+      return false;
+    }
+
+    var locationPermission = await FlLocation.checkLocationPermission();
+    if (locationPermission == LocationPermission.deniedForever) {
+      // Cannot request runtime permission because location permission is denied forever.
+      return false;
+    } else if (locationPermission == LocationPermission.denied) {
+      // Ask the user for location permission.
+      locationPermission = await FlLocation.requestLocationPermission();
+      if (locationPermission == LocationPermission.denied ||
+          locationPermission == LocationPermission.deniedForever) return false;
+    }
+
+    // Location permission must always be allowed (LocationPermission.always)
+    // to collect location data in the background.
+    if (background == true &&
+        locationPermission == LocationPermission.whileInUse) return false;
+
+    // Location services has been enabled and permission have been granted.
+    return true;
+  }
+
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
+      _checkAndRequestPermission();
+
     _streamSubscription = FlLocation.getLocationStream().listen((event) {
       FlutterForegroundTask.updateService(
         notificationTitle: 'My Location',

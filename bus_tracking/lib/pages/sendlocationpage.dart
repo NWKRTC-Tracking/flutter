@@ -16,14 +16,14 @@ void startCallback() {
 
 
 
-class ExamplePage extends StatefulWidget {
-  const ExamplePage({Key? key}) : super(key: key);
+class SendLocationPage extends StatefulWidget {
+  const SendLocationPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ExamplePageState();
+  State<StatefulWidget> createState() => _SendLocationPageState();
 }
 
-class _ExamplePageState extends State<ExamplePage> {
+class _SendLocationPageState extends State<SendLocationPage> {
 
 
   ReceivePort? _receivePort;
