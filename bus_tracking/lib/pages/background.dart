@@ -1,12 +1,19 @@
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:isolate';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:http/http.dart' as http;
 
 class FirstTaskHandler extends TaskHandler {
   SendPort? _sendPort;
   StreamSubscription<Location>? _streamSubscription;
+  Map sentData = {
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "time": 0
+  };
 
   Future<bool> _checkAndRequestPermission({bool? background}) async {
     if (!await FlLocation.isLocationServicesEnabled) {
@@ -34,24 +41,63 @@ class FirstTaskHandler extends TaskHandler {
     return true;
   }
 
+  Future<Map> sendLocation(Map data) async {
+    int beforeSending =  DateTime.now().millisecondsSinceEpoch;
+
+    var url = 'http://10.196.7.251:8080/api/location';
+    //encode Map to JSON
+    var body = json.encode(data);
+
+    var response = await http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"}, body: body);
+    print("${response.statusCode}");
+
+    print(response.body.runtimeType);
+
+    if (response.statusCode == 200) {
+      data['statusCode'] = response.statusCode;
+      data['delay'] =  DateTime.now().millisecondsSinceEpoch+ -beforeSending;
+      print("status code is 200");
+      return data;
+    } else {
+      
+      print("Exception caught: Failed to get data");
+      return data;
+
+    }
+  }
+
+
+
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
       _checkAndRequestPermission();
 
-    _streamSubscription = FlLocation.getLocationStream().listen((event) {
+    _streamSubscription = FlLocation.getLocationStream().listen((event) async {
+     
+      int currentTime =  DateTime.now().millisecondsSinceEpoch;
+      Map data = {
+        'latitude': event.latitude,
+        'longitude': event.longitude,
+        "start_time": currentTime,
+        "time": currentTime,
+        'key': "arvind69"
+      };
+      
+      data =  await sendLocation(data);
+
+      print(data);
+      
       FlutterForegroundTask.updateService(
         notificationTitle: 'My Location',
         notificationText: '${event.latitude}, ${event.longitude}',
       );
-
-      // Send data to the main isolate.
-      sendPort?.send(event);
+      sendPort?.send(data);
     });
   }
 
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
-  
   }
 
   @override
@@ -74,7 +120,7 @@ class FirstTaskHandler extends TaskHandler {
     // this function to be called.
 
     // Note that the app will only route to "/resume-route" when it is exited so
-    // it will usually be necessary to send a message through the send port to
+    // it will usually be necessary to send a event through the send port to
     // signal it to restore state when the app is already started.
     FlutterForegroundTask.launchApp("/resume-route");
     _sendPort?.send('onNotificationPressed');

@@ -4,7 +4,7 @@ import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-final String url = "http://10.196.9.48:8080/api/location/arvind69/";
+final String url = "http://10.196.7.251:8080/api/location/arvind69/";
 
 class Location extends StatefulWidget {
   Location({Key? key}) : super(key: key);
@@ -19,7 +19,7 @@ class _LocationState extends State<Location> {
 
   Future fetchUser() async {
     final response = await http.get(Uri.parse(url));
-
+    print(response.body);
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -34,8 +34,8 @@ class _LocationState extends State<Location> {
         // lat = 15.518832 + 0.01 * (res['id'] % 50);
         // long = 74.925252 + 0.01 * (res['id'] % 50);
         print(res);
-        lat = double.parse(res['latitude']);
-        long = double.parse(res['longitude']);
+        lat = (res['latitude']);
+        long = (res['longitude']);
       });
       print(lat);
       print(long);

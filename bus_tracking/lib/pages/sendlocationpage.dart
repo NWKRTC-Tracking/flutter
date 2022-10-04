@@ -32,6 +32,7 @@ class _SendLocationPageState extends State<SendLocationPage> {
   DateTime lastSentTime = DateTime(0,0,0,0,0);
   double lastLatitude = 0.0;
   double lastLongitude = 0.0;
+  int delay = 0;
 
 
   // ...
@@ -108,66 +109,26 @@ class _SendLocationPageState extends State<SendLocationPage> {
     return _registerReceivePort(receivePort);
   }
 
-
-  Future sendLocation(Map data) async {
-
-    var url = 'http://10.196.9.48:8080/api/location';
-    
-    print(data);
-    //encode Map to JSON
-    var body = json.encode(data);
-
-    var response = await http.post(Uri.parse(url),
-        headers: {"Content-Type": "application/json"}, body: body);
-    print("${response.statusCode}");
-    print("${response.body}");
-
-
-    if (response.statusCode == 200) {
-
-      setState(() {
-        lastSentTime = DateTime.fromMillisecondsSinceEpoch(data['currentTime']);
-        lastLatitude = data['latitude'];
-        lastLongitude = data['longitude'];
-      });
-
-      return json.decode(response.body);
-    } else {
-      print("Exception caught: Failed to get data");
-    }
-  }
-
   bool _registerReceivePort(ReceivePort? receivePort) {
     _closeReceivePort();
-
+    print(receivePort);
     if (receivePort != null) {
       _receivePort = receivePort;
       _receivePort?.listen((message) {
-        print(message.toString()+ " inside register recive type = "+ message.runtimeType.toString());
-
-        print(message.latitude.toString()+message.longitude.toString());
-        if (message.runtimeType.toString() == "Location") {
-
-          
-          print("it is location");
-          int currentTime =  DateTime.now().millisecondsSinceEpoch;
-          print("current real");
-          print(currentTime);
-          Map data = {
-            'latitude': message.latitude,
-            'longitude': message.longitude,
-            "start_time": currentTime,
-            "time": currentTime,
-            'key': "arvind69"
-          };
-
-          sendLocation(data);
-
-        } else if (message is String) {
-          if (message == 'onNotificationPressed') {
-            Navigator.of(context).pushNamed('/resume-route');
-          }
+        print("inside recieve");
+        print(message);
+       
+        if(message.containsKey('statusCode') && message['statusCode']==200){
+          setState(() {
+            print("updateing latitude and all");
+            lastSentTime = DateTime.fromMillisecondsSinceEpoch(message['time']);
+            lastLatitude = message['latitude'];
+            lastLongitude = message['longitude'];
+            delay = message['delay'];
+          });
         }
+
+        
       });
 
       return true;
@@ -277,7 +238,8 @@ Widget build(BuildContext context) {
         ),
         dataBuilder("Previous Sent Time", lastSentTime.toString()),
         dataBuilder("Previous Sent Longitude", lastLongitude.toString()),
-        dataBuilder("Previous Sent Latitude", lastLatitude.toString())
+        dataBuilder("Previous Sent Latitude", lastLatitude.toString()),
+        dataBuilder("Delay", delay.toString())
         
       ]
     );
