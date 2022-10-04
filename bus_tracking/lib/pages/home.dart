@@ -8,6 +8,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -109,57 +110,26 @@ class _HomeState extends State<Home> {
   super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
   return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
+        actions: [
+          FlatButton.icon(onPressed: (){
+            // Navigator.push(context, '/login');
+            Navigator.pushNamed(context, '/login');
+          }, 
+          icon: Icon(
+            Icons.login
+          ), label: Text('Login'))
+        ],
       ),
-      body: Center(
+      body: const Center(
           child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            // 1
-            ListTile(
-              title: const Text("Initial Link"),
-              subtitle: Text(_initialURI.toString()),
-            ),
-            // 2
-            if (!kIsWeb) ...[
-              // 3
-              ListTile(
-                title: const Text("Current Link Host"),
-                subtitle: Text('${_currentURI?.host}'),
-              ),
-              // 4
-              ListTile(
-                title: const Text("Current Link Scheme"),
-                subtitle: Text('${_currentURI?.scheme}'),
-              ),
-              // 5
-              ListTile(
-                title: const Text("Current Link"),
-                subtitle: Text(_currentURI.toString()),
-              ),
-              // 6
-              ListTile(
-                title: const Text("Current Link Path"),
-                subtitle: Text('${_currentURI?.path}'),
-              )
-            ],
-            // 7
-            if (_err != null)
-              ListTile(
-                title:
-                    const Text('Error', style: TextStyle(color: Colors.red)),
-                subtitle: Text(_err.toString()),
-              ),
-            const SizedBox(height: 20,),
-            const Text("Check the blog for testing instructions")
-          ],
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Text('Home'),
       )));
   }
 
