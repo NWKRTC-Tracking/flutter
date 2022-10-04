@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-final String url = "http://10.196.7.251:8080/api/location/arvind69/";
+import '../config/url.dart';
+final String url = "${getUrl()}api/location/arvind69/";
 
 class Location extends StatefulWidget {
   Location({Key? key}) : super(key: key);

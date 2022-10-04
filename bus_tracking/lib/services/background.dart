@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
+import 'package:bus_tracking/config/url.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:http/http.dart' as http;
@@ -44,7 +45,7 @@ class FirstTaskHandler extends TaskHandler {
   Future<Map> sendLocation(Map data) async {
     int beforeSending =  DateTime.now().millisecondsSinceEpoch;
 
-    var url = 'http://10.196.7.251:8080/api/location';
+    var url = '${getUrl()}api/location';
     //encode Map to JSON
     var body = json.encode(data);
 
