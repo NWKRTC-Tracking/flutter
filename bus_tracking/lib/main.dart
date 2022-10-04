@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:js';
 
 
 import 'package:bus_tracking/pages/home.dart';

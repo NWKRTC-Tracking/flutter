@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:bus_tracking/pages/sendLocation.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +62,8 @@ class _LoginWidgetState extends State<LoginWidget> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  late String token;
+
   Future<String?> attemptLogIn(String phoneNo, String password) async {
     final msg = jsonEncode({"phoneNo":phoneNo,"password":password,});
       Map<String,String> headers = {'Content-Type':'application/json'};
@@ -74,7 +75,9 @@ class _LoginWidgetState extends State<LoginWidget> {
     
 
     if(response.statusCode == 200){ 
-      storage.write(key: "token", value: (jsonDecode(response.body)['token']));
+      setState(() {
+        token = jsonDecode(response.body)['token'].toString();
+      });
       return response.body;
       }
     return null;
@@ -131,10 +134,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                   onPressed: () async {
                     var username = nameController.text.toString();
                     var password = passwordController.text.toString();
-                    print(username+password);
                     var jwt = await attemptLogIn(username, password);
                     if(jwt != null) {
-                      storage.write(key: "jwt", value: jwt);
+                      await storage.write(key: "token", value: token);
+                      await storage.write(key: "jwt", value: jwt);
                       Navigator.push(
                         context,
                         MaterialPageRoute(

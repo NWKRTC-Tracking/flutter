@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/pages/Login/login.dart';
@@ -67,12 +66,18 @@ bool _initialURILinkHandled = false;
 
 class _sendLocationState extends State<sendLocation> {
 
+  late String token;
+
+
+
   @override
   Widget build(BuildContext context) {
-    print('token in send location');
-    final test = storage.read(key: 'token');
-    print(json.decode(test));
-    print(test);
+
+    storage.read(key: "token").then((value){
+      setState(() {
+        token = value!;
+      });
+    });
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
