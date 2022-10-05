@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -119,6 +121,17 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        title: Text('HOME'),
+        actions: [
+          FlatButton.icon(onPressed: (){
+            Navigator.pushNamed(context, '/login');
+          }, 
+          icon: Icon(
+            Icons.login
+          ), label: Text('Login'))
+        ],
+      ),
       body: Column(
         children: <Widget>[
           FlatButton.icon(
@@ -138,9 +151,10 @@ class _HomeState extends State<Home> {
               icon: Icon(Icons.directions_bus),
               label: Text('Send Location'),
               ),
-
-        ],
+        ]
       )
     );
   }
 }
+
+        
