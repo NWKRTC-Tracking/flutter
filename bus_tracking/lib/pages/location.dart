@@ -4,7 +4,14 @@ import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config/url.dart';
+
+
 final String url = "${getUrl()}api/location/arvind69/";
+
+
+// final String url = "http://10.196.9.48:8080/api/location/arvind69/";
+// final String url = "https://api.wheretheiss.at/v1/satellites/25544";
+
 
 class Location extends StatefulWidget {
   Location({Key? key}) : super(key: key);
@@ -33,12 +40,11 @@ class _LocationState extends State<Location> {
       setState(() {
         // lat = 15.518832 + 0.01 * (res['id'] % 50);
         // long = 74.925252 + 0.01 * (res['id'] % 50);
-        print(res);
         lat = (res['latitude']);
         long = (res['longitude']);
+        // lat = double.parse(res['latitude']);
+        // long = double.parse(res['longitude']);
       });
-      print(lat);
-      print(long);
       return res;
     });
   }
@@ -47,7 +53,7 @@ class _LocationState extends State<Location> {
   void initState() {
     super.initState();
     _locationController = StreamController();
-    Timer.periodic(Duration(seconds: 2), (_) => loadLocation());
+    Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
   }
 
   @override
@@ -60,9 +66,13 @@ class _LocationState extends State<Location> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[200],
       // body: SafeArea(
         // child: Text("location"),
+      appBar: AppBar(
+        backgroundColor: Colors.blue[800],
+        title: Text('Bus Location'),
+      ),
+      backgroundColor: Colors.grey[200],
       body: StreamBuilder(
           stream: _locationController.stream,
           builder: (context, snapshot) {
@@ -79,13 +89,16 @@ class _LocationState extends State<Location> {
                       lat: lat,
                       long: long,
                     ),
-                    SizedBox(height: 10),
+                    // SizedBox(height: 10),
+                    // FloatingActionButton(onPressed: (){
+                    //   print('pressed');
+                    // })
                     // Text(lat as String)
                   ],
                 ),
               );
             }
-            return Text('Loading');
+            return Text('');
           }),
     );
   }

@@ -82,9 +82,9 @@ class _displayMapState extends State<displayMap> {
                   width: 60,
                   height: 60,
                   builder: (context) => const Icon(
-                    Icons.pin_drop,
+                    Icons.bus_alert,
                     size: 60,
-                    color: Colors.blueAccent,
+                    color: Colors.redAccent,
                   ),
                 ))
             .toList();
@@ -97,53 +97,93 @@ class _displayMapState extends State<displayMap> {
     }
     return Expanded(
       child: Scaffold(
+        //TODO
         appBar: AppBar(
-          title: Text(widget.lat.toString()),
+          title: Text('Lat - '+widget.lat.toString().substring(0,7)+'   Long - '+widget.long.toString().substring(0,7)),
         ),
-        body: FlutterMap(
-          mapController: _mapController,
-          options: MapOptions(
-            // swPanBoundary: LatLng(13, 77.5),
-            // nePanBoundary: LatLng(13.07001, 77.58),
-            center: _latLngList.elementAt(0),
-            bounds: LatLngBounds.fromPoints(_latLngList),
-            zoom: _zoom,
-            // onPositionChanged: (position, hasGesture) =>
-            //     {_mapController.move(LatLng(widget.lat, widget.long), _zoom)},
-            plugins: [
-              MarkerClusterPlugin(),
+        body: Stack(
+          children: <Widget>[
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              // swPanBoundary: LatLng(13, 77.5),
+              // nePanBoundary: LatLng(13.07001, 77.58),
+              center: _latLngList.elementAt(0),
+              bounds: LatLngBounds.fromPoints(_latLngList),
+              zoom: _zoom,
+              interactiveFlags: InteractiveFlag.all,
+              // onPositionChanged: (position, hasGesture) =>
+              //     {_mapController.move(LatLng(widget.lat, widget.long), _zoom)},
+              plugins: [
+                MarkerClusterPlugin(),
+              ],
+            ),
+            layers: [
+              TileLayerOptions(
+                minZoom: 2,
+                maxZoom: 25,
+              
+                backgroundColor: Colors.black,
+                // errorImage: ,
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c'],
+              ),
+              MarkerClusterLayerOptions(
+                maxClusterRadius: 190,
+                disableClusteringAtZoom: 16,
+                size: const Size(50, 50),
+                
+                fitBoundsOptions: const FitBoundsOptions(
+                  padding: EdgeInsets.all(50),
+                
+                ),
+                markers: _markers,
+                polygonOptions: const PolygonOptions(
+                    borderColor: Colors.blueAccent,
+                    color: Colors.black12,
+                    borderStrokeWidth: 3),
+                builder: (context, markers) {
+                  return Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        color: Colors.orange, shape: BoxShape.circle),
+                    child: Text('${markers.length}'),
+                  );
+                },
+              ),
             ],
           ),
-          layers: [
-            TileLayerOptions(
-              minZoom: 2,
-              maxZoom: 18,
-              backgroundColor: Colors.black,
-              // errorImage: ,
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'],
-            ),
-            MarkerClusterLayerOptions(
-              maxClusterRadius: 190,
-              disableClusteringAtZoom: 16,
-              size: const Size(50, 50),
-              fitBoundsOptions: const FitBoundsOptions(
-                padding: EdgeInsets.all(50),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
+            child: Align(
+                alignment: Alignment.bottomRight,
+                // add your floating action button
+                child: FloatingActionButton(
+                  onPressed: () {
+                    // print('Location recenter');
+                    // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
+                    _mapController.moveAndRotate(LatLng(widget.lat,widget.long), _zoom, 0.0);
+                  },
+                  child: Icon(Icons.pin_drop)
+                ),
               ),
-              markers: _markers,
-              polygonOptions: const PolygonOptions(
-                  borderColor: Colors.blueAccent,
-                  color: Colors.black12,
-                  borderStrokeWidth: 3),
-              builder: (context, markers) {
-                return Container(
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                      color: Colors.orange, shape: BoxShape.circle),
-                  child: Text('${markers.length}'),
-                );
-              },
-            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
+            child: Align(
+                alignment: Alignment.topRight,
+                // add your floating action button
+                child: FloatingActionButton(
+                  onPressed: () {
+                    // print('Location recenter');
+                    // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
+                    // _mapController.moveAndRotate(center, zoom, degree)
+                    _mapController.rotate(0);
+                  },
+                  child: Icon(Icons.north_rounded)
+                ),
+              ),
+          ),
           ],
         ),
       ),
