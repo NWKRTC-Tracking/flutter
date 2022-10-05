@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/services/displayMap.dart';
@@ -27,6 +28,8 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    // var curTime = DateTime.now().millisecondsSinceEpoch;
+    // storage.write(key: 'timeStamp',value: curTime.toString());
     super.initState();
   _initURIHandler();
   _incomingLinkHandler();

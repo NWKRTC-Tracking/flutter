@@ -11,7 +11,7 @@ import '../config/url.dart';
 
 
 // final String url = "http://10.196.9.48:8080/api/location/";
-const String url = "https://api.wheretheiss.at/v1/satellites/25544";
+String url = "http://10.196.7.251:8080/api/location/";
 
 
 class Location extends StatefulWidget {
@@ -64,6 +64,8 @@ class _LocationState extends State<Location> {
     // if(widget.apiKey == ""){
     //   Navigator.pushReplacementNamed(context, '/');
     // }
+    url += widget.apiKey;
+    
     super.initState();
     _locationController = StreamController();
     Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
