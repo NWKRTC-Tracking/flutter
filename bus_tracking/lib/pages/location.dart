@@ -15,13 +15,19 @@ const String url = "https://api.wheretheiss.at/v1/satellites/25544";
 
 
 class Location extends StatefulWidget {
-  Location({Key? key}) : super(key: key);
+  static const routeName = '/location';
+
+  String conductorNo = "kqwnd", busNo = "qw dk";
+  Location({Key? key, required this.conductorNo, required this.busNo}) : super(key: key);
 
   @override
   State<Location> createState() => _LocationState();
 }
 
 class _LocationState extends State<Location> {
+
+
+
   late StreamController _locationController;
   double lat = 0, long = 0;
   bool _isDisposed = false;
@@ -50,8 +56,14 @@ class _LocationState extends State<Location> {
     });
   }
 
+  void validateData(String conductorNo, String busNo){
+    print(conductorNo);
+    print(busNo);
+  }
+
   @override
   void initState() {
+    validateData(widget.conductorNo,widget.busNo);
     super.initState();
     _locationController = StreamController();
     Timer.periodic(Duration(seconds: 1), (_) => loadLocation());

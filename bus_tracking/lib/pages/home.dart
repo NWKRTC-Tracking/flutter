@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:bus_tracking/models/locationData.dart';
+import 'package:bus_tracking/pages/location.dart';
+import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -116,6 +119,9 @@ class _HomeState extends State<Home> {
   super.dispose();
   }
 
+  TextEditingController phoneNoController = TextEditingController();
+  TextEditingController busNameController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -134,23 +140,63 @@ class _HomeState extends State<Home> {
       ),
       body: Column(
         children: <Widget>[
-          FlatButton.icon(
-              onPressed: () async {
-                dynamic result =
-                    await Navigator.pushNamed(context, "/location");
-              },
-              icon: Icon(Icons.location_city),
-              label: Text('See Location')
+          Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(10),
+              child: const Text(
+                'Track Bus',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 30),
+              )),
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: TextField(
+              controller: phoneNoController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Conductor Mobile No',
               ),
-
-          FlatButton.icon(
-              onPressed: () async {
-                dynamic result =
-                    await Navigator.pushNamed(context, "/sendlocation");
-              },
-              icon: Icon(Icons.directions_bus),
-              label: Text('Send Location'),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: TextField(
+              obscureText: true,
+              controller: busNameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Bus No',
               ),
+            ),
+          ),
+          SizedBox(height: 20,),
+          Container(
+              height: 50,
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: ElevatedButton(
+                child: const Text('Track'),
+                onPressed: () async {
+                  var phoneNo = phoneNoController.text.toString();
+                  var busNo = busNameController.text.toString();
+                  Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
+                  // var jwt = await attemptLogIn(username, password);
+                  // if(jwt != null) {
+                  //   await storage.write(key: "token", value: token);
+                  //   await storage.write(key: "jwt", value: jwt);
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => sendLocation(),
+                  //     )
+                  //   );
+                  // } else {
+                  //   AlertDialog(semanticLabel: "An Error Occurred No account was found matching that username and password");
+                  // }
+                },
+              )
+          )
         ]
       )
     );

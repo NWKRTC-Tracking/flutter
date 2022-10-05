@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/pages/Login/login.dart';
+import 'package:bus_tracking/pages/sendlocationpage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,7 +43,7 @@ class sendLocationCheck extends StatelessWidget {
             } else {
               var payload = json.decode(ascii.decode(base64.decode(base64.normalize(jwt[1]))));
               if(DateTime.fromMillisecondsSinceEpoch(payload["exp"]*1000).isAfter(DateTime.now())) {
-                return sendLocation();
+                return SendLocationPage();
               } else {
                 return LoginWidget();
               }

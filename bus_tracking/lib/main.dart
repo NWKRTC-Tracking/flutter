@@ -2,6 +2,7 @@
 // import 'dart:io';
 
 
+import 'package:bus_tracking/models/locationData.dart';
 import 'package:bus_tracking/pages/home.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/pages/sendlocationpage.dart';
@@ -47,9 +48,24 @@ void main() {
     routes: {
       "/": ((context) => Home()),
       "/login" : ((context) => Login()),
-      "/location" : ((context) => Location()),
-      "/sendlocation": ((context) => SendLocationPage()),
+      // "/location" : ((context) => Location(conductorNo: "1",busNo: "1",)),
+      "/sendlocation": ((context) => sendLocationCheck()),
     },
+    onGenerateRoute: (settings) {
+          if (settings.name == Location.routeName) {
+            locationData? args = (settings.arguments?? locationData(" ", " ")) as locationData?;
+            return MaterialPageRoute(
+              builder: (context) {
+                return Location(
+                  conductorNo: args!.conductorNo,
+                  busNo: args.busNo,
+                );
+              },
+            );
+          }
+          assert(false, 'Implementation ${settings.name}');
+          return null;
+        },
     onUnknownRoute: (RouteSettings settings) {
       return MaterialPageRoute<void>(
         settings: settings,
