@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 import '../config/url.dart';
 
 
-final String url = "${getUrl()}api/location/arvind69/";
+// final String url = "${getUrl()}api/location/arvind69/";
 
 
 // final String url = "http://10.196.9.48:8080/api/location/arvind69/";
-// final String url = "https://api.wheretheiss.at/v1/satellites/25544";
+const String url = "https://api.wheretheiss.at/v1/satellites/25544";
 
 
 class Location extends StatefulWidget {
@@ -23,6 +23,7 @@ class Location extends StatefulWidget {
 class _LocationState extends State<Location> {
   late StreamController _locationController;
   double lat = 0, long = 0;
+  bool _isDisposed = false;
 
   Future fetchUser() async {
     final response = await http.get(Uri.parse(url));
@@ -35,15 +36,14 @@ class _LocationState extends State<Location> {
   }
 
   loadLocation() async {
+    if(_isDisposed) {
+      return;
+    }
     fetchUser().then((res) async {
       _locationController.add(res);
       setState(() {
-        // lat = 15.518832 + 0.01 * (res['id'] % 50);
-        // long = 74.925252 + 0.01 * (res['id'] % 50);
         lat = (res['latitude']);
         long = (res['longitude']);
-        // lat = double.parse(res['latitude']);
-        // long = double.parse(res['longitude']);
       });
       return res;
     });
@@ -61,17 +61,12 @@ class _LocationState extends State<Location> {
     print("closed");
     _locationController.close();
     super.dispose();
+    _isDisposed = true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: SafeArea(
-        // child: Text("location"),
-      appBar: AppBar(
-        backgroundColor: Colors.blue[800],
-        title: Text('Bus Location'),
-      ),
       backgroundColor: Colors.grey[200],
       body: StreamBuilder(
           stream: _locationController.stream,
@@ -89,11 +84,6 @@ class _LocationState extends State<Location> {
                       lat: lat,
                       long: long,
                     ),
-                    // SizedBox(height: 10),
-                    // FloatingActionButton(onPressed: (){
-                    //   print('pressed');
-                    // })
-                    // Text(lat as String)
                   ],
                 ),
               );
