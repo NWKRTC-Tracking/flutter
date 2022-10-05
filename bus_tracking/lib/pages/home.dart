@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:bus_tracking/models/locationData.dart';
+import 'dart:convert';
+import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/foundation.dart';
@@ -106,6 +107,23 @@ class _HomeState extends State<Home> {
     }
   }
   }
+  Future<String?> isValidData(String phoneNo, String busNo) async {
+    final msg = jsonEncode({"number":phoneNo,"bus_no":busNo});
+      Map<String,String> headers = {'Content-Type':'application/json'};
+    var response = await http.post(
+      Uri.parse('http://10.196.7.251:8080/api/get-key/'),
+      headers: headers,
+      body: msg,
+    );
+    
+    if(response.statusCode == 200){ 
+      // setState(() {
+      //   apiKey = jsonDecode(response.body)['key'].toString();
+      // });
+      return jsonDecode(response.body)['key'].toString();
+      }
+    return null;
+  }
   // @override
   // void initState() {
   // super.initState();
@@ -156,14 +174,13 @@ class _HomeState extends State<Home> {
               controller: phoneNoController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Conductor Mobile No',
+                labelText: 'Conductor Number',
               ),
             ),
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
             child: TextField(
-              obscureText: true,
               controller: busNameController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -180,20 +197,17 @@ class _HomeState extends State<Home> {
                 onPressed: () async {
                   var phoneNo = phoneNoController.text.toString();
                   var busNo = busNameController.text.toString();
-                  Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
-                  // var jwt = await attemptLogIn(username, password);
-                  // if(jwt != null) {
-                  //   await storage.write(key: "token", value: token);
-                  //   await storage.write(key: "jwt", value: jwt);
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => sendLocation(),
-                  //     )
-                  //   );
-                  // } else {
-                  //   AlertDialog(semanticLabel: "An Error Occurred No account was found matching that username and password");
-                  // }
+                  print(phoneNo+" "+busNo);
+                  // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
+                  var apiKey = await isValidData(phoneNo, busNo);
+                  if(apiKey != null) {
+                    Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey));
+                  } else {
+                    print('else part');
+                    AlertDialog(
+                      content: Text('Error occured'),
+                    );
+                  }
                 },
               )
           )

@@ -2,7 +2,9 @@
 // import 'dart:io';
 
 
-import 'package:bus_tracking/models/locationData.dart';
+import 'dart:js';
+
+import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/home.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/pages/sendlocationpage.dart';
@@ -32,7 +34,7 @@ import 'package:provider/provider.dart';
 
 import 'bloc.dart';
 import 'package:bus_tracking/pages/Login/login.dart';
-import 'package:bus_tracking/pages/sendLocation.dart';
+import 'package:bus_tracking/pages/sendLocationCheck.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -48,17 +50,22 @@ void main() {
     routes: {
       "/": ((context) => Home()),
       "/login" : ((context) => Login()),
-      // "/location" : ((context) => Location(conductorNo: "1",busNo: "1",)),
       "/sendlocation": ((context) => sendLocationCheck()),
     },
     onGenerateRoute: (settings) {
           if (settings.name == Location.routeName) {
-            locationData? args = (settings.arguments?? locationData(" ", " ")) as locationData?;
+            locationKey? args = (settings.arguments?? locationKey("")) as locationKey?;
+            // if(args!.key == ""){
+            //   print('apikey null in main');
+            //   return MaterialPageRoute(builder: (context){
+            //     Navigator.pushReplacementNamed(context, '/');
+            //     return Text('Home');
+            //   });
+            // }
             return MaterialPageRoute(
               builder: (context) {
                 return Location(
-                  conductorNo: args!.conductorNo,
-                  busNo: args.busNo,
+                  apiKey: args!.key,
                 );
               },
             );

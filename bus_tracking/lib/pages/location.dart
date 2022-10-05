@@ -10,15 +10,15 @@ import '../config/url.dart';
 // final String url = "${getUrl()}api/location/arvind69/";
 
 
-// final String url = "http://10.196.9.48:8080/api/location/arvind69/";
+// final String url = "http://10.196.9.48:8080/api/location/";
 const String url = "https://api.wheretheiss.at/v1/satellites/25544";
 
 
 class Location extends StatefulWidget {
   static const routeName = '/location';
 
-  String conductorNo = "kqwnd", busNo = "qw dk";
-  Location({Key? key, required this.conductorNo, required this.busNo}) : super(key: key);
+  String apiKey;
+  Location({Key? key, required this.apiKey}) : super(key: key);
 
   @override
   State<Location> createState() => _LocationState();
@@ -31,6 +31,7 @@ class _LocationState extends State<Location> {
   late StreamController _locationController;
   double lat = 0, long = 0;
   bool _isDisposed = false;
+  late String token;
 
   Future fetchUser() async {
     final response = await http.get(Uri.parse(url));
@@ -56,14 +57,13 @@ class _LocationState extends State<Location> {
     });
   }
 
-  void validateData(String conductorNo, String busNo){
-    print(conductorNo);
-    print(busNo);
-  }
 
   @override
   void initState() {
-    validateData(widget.conductorNo,widget.busNo);
+    print(widget.apiKey);
+    // if(widget.apiKey == ""){
+    //   Navigator.pushReplacementNamed(context, '/');
+    // }
     super.initState();
     _locationController = StreamController();
     Timer.periodic(Duration(seconds: 1), (_) => loadLocation());

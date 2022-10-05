@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:isolate';
 
+import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/services/background.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/material.dart';
@@ -201,6 +202,15 @@ Widget build(BuildContext context) {
         appBar: AppBar(
           title: const Text('Send Location'),
           centerTitle: true,
+          actions: [
+            FlatButton.icon(onPressed: ()async{
+              await storage.deleteAll();
+              Navigator.pushReplacementNamed(context, '/');
+            }, icon: Icon(
+              Icons.logout
+            ), label: Text('Log Out'))
+          ],
+          
         ),
         body: _buildContentView(),
       ),

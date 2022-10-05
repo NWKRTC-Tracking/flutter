@@ -24,7 +24,7 @@ class PocWidget extends StatelessWidget {
         //               child: Text('Redirected: ${snapshot.data}',
         //                   style: Theme.of(context).textTheme.headline6))));
         // }
-        return Location(conductorNo: "",busNo: "");
+        return Location(apiKey: "",);
       },
     );
   }
