@@ -1,9 +1,9 @@
-import 'dart:html';
 
 import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/home.dart';
 import 'package:bus_tracking/pages/location.dart';
-import 'package:bus_tracking/pages/sendlocationpage.dart';
+import 'package:bus_tracking/pages/resumepage.dart';
+// import 'package:bus_tracking/pages/sendlocationpage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bus_tracking/poc.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +47,7 @@ void main() {
       "/": ((context) => Home()),
       "/login" : ((context) => Login()),
       "/sendlocation": ((context) => sendLocationCheck()),
+      '/resume-route': (context) => const ResumeRoutePage(),
     },
     onGenerateRoute: (settings) {
           if (settings.name == Location.routeName) {

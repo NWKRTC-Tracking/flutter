@@ -70,7 +70,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     final msg = jsonEncode({"phoneNo":phoneNo,"password":password,});
       Map<String,String> headers = {'Content-Type':'application/json'};
     var response = await post(
-      Uri.parse('http://10.196.7.251:8080/api/login/'),
+      Uri.parse('http://10.196.8.80:80/api/login/'),
       headers: headers,
       body: msg,
     );
