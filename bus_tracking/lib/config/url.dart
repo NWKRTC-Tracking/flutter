@@ -1,3 +1,3 @@
 String getUrl(){
-  return "http://10.196.7.251:8080/";
+  return "http://10.196.8.80:80/";
 }

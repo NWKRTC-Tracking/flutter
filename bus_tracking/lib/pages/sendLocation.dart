@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:isolate';
 
+import 'package:bus_tracking/main.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/key.dart';
 // import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:http/http.dart' as http;
+import 'package:bus_tracking/config/url.dart';
 
 
 @pragma('vm:entry-point')
@@ -22,15 +26,80 @@ void startCallback() {
 class FirstTaskHandler extends TaskHandler {
 
   StreamSubscription<Location>? _streamSubscription;
+  String? token, tripId, jwt;
+  int? zeroError;
+
+  Future<Map> sendLocation(Map data) async {
+    int beforeSending =  DateTime.now().millisecondsSinceEpoch;
+
+    var url = '${getUrl()}api/location';
+    //encode Map to JSON
+    var body = json.encode(data);
+
+    var response = await Future.delayed(Duration(seconds: 1));
+
+    data['statusCode'] = 200;
+    data['lastSentTime'] = DateTime.now().millisecondsSinceEpoch;
+
+    return data;
+
+    // var response = await http.post(Uri.parse(url),
+    //     headers: {"Content-Type": "application/json", "Authorization":"Bearer $token"}, body: body);
+    // print("${response.statusCode}");
+
+    // print(response.body.runtimeType);
+
+    // if (response.statusCode == 200) {
+    //   data['statusCode'] = response.statusCode;
+    //   data['delay'] =  DateTime.now().millisecondsSinceEpoch+ -beforeSending;
+    //   print("status code is 200");
+    //   return data;
+    // } else {
+      
+    //   print("Exception caught: Failed to get data");
+    //   FlutterForegroundTask.stopService();
+    //   return data;
+    // }
+
+
+    
+  }
 
  
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
-    
-    _streamSubscription = FlLocation.getLocationStream().listen((event) {
+
+   
+
+    storage.read(key: "jwt").then((value) {
+      jwt = value;
+    });
+    storage.read(key: "tripId").then((value) {
+      tripId = value;
+    });
+    storage.read(key: "token").then((value){
+      token = value;
+    });
+    storage.read(key: "zero_error").then((value) {
+      zeroError = int.parse(value!);
+    });
+
+    _streamSubscription = FlLocation.getLocationStream().listen((event) async {
 
       // controllerLat.add(event.latitude);
+      print("inside the stream");
+      int currentTime =  DateTime.now().millisecondsSinceEpoch;
+      
+      Map data = {
+        'latitude': event.latitude,
+        'longitude': event.longitude,
+        "start_time": currentTime,
+        "time": currentTime,
+        'key': tripId,
+        "zero_error" : zeroError
+      };
+      data =  await sendLocation(data);
 
       FlutterForegroundTask.updateService(
         notificationTitle: 'My Location',
@@ -39,7 +108,7 @@ class FirstTaskHandler extends TaskHandler {
 
       // Send data to the main isolate.
       // print(event);
-      sendPort?.send(event);
+      sendPort?.send(data);
     });
   }
 
@@ -90,6 +159,7 @@ class _sendLocationState extends State<sendLocation> {
   // late StreamSubscription<double> streamLat;
 
   double lat = 0, long = 0;
+  bool isTripStarted = false;
 
 
    Future<bool> _checkAndRequestPermission({bool? background}) async {
@@ -199,8 +269,8 @@ class _sendLocationState extends State<sendLocation> {
         print('message');
         print(message);
         setState(() {
-          lat = message.latitude;
-          long = message.longitude;
+          lat = message['latitude'];
+          long = message['longitude'];
         });
         if (message is DateTime) {
           print('timestamp: ${message.toString()}');
@@ -226,10 +296,18 @@ class _sendLocationState extends State<sendLocation> {
   void initState() {
     _checkAndRequestPermission();
     super.initState();
+
+    storage.write(key: "tripId", value: "d99b9824f405f1385c23907d70192d5cc57bce60");
+    storage.write(key: "zeroError",value: "1234");
+    storage.write(key: "startTime", value: "1664948125000");
+
     _initForegroundTask();
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       // You can get the previous ReceivePort without restarting the service.
       if (await FlutterForegroundTask.isRunningService) {
+        setState(() {
+          isTripStarted = true;
+        });
         _startForegroundTask();
         print('flutter foreground atsk');
         final newReceivePort = await FlutterForegroundTask.receivePort;
@@ -275,15 +353,46 @@ class _sendLocationState extends State<sendLocation> {
           title: Text('Send'),
         ),
         body: Column(
+
           children: <Widget>[
-            FlatButton(onPressed:_startForegroundTask
-            , child: Text('Send')),
-            SizedBox(height: 20,),
-            FlatButton(onPressed: _stopForegroundTask, child: Text('stop')),
-            SizedBox(height: 20,),
-            Text('$lat'),
-            SizedBox(height: 20,),
-            Text('$long'),
+            Expanded(
+              child: Center(
+                child: ElevatedButton(onPressed:(){
+                    isTripStarted ? _stopForegroundTask(): _startForegroundTask();
+              
+                    setState(() {
+                      isTripStarted = !isTripStarted;
+                    });
+                  }
+                , child:  Text(isTripStarted ? "Stop":"Start", style: TextStyle(
+                  fontSize: 20,
+              
+              
+                ),),
+                style: ElevatedButton.styleFrom(
+                
+                  primary: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(50),
+                ),
+                
+                ),
+              ),
+            ),
+
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(height: 20,),
+                  SizedBox(height: 20,),
+                  Text('$lat'),
+                  SizedBox(height: 20,),
+                  Text('$long'),
+                ],
+              ),
+            )
+            
+            
           ],
         ),
       ),
