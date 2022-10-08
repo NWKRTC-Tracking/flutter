@@ -19,6 +19,7 @@ class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
  
   static const String _title = 'NWKRTC';
+
  
   @override
   Widget build(BuildContext context) {
@@ -29,6 +30,7 @@ class Login extends StatelessWidget {
           body: FutureBuilder(
           future: jwtOrEmpty,            
           builder: (context, snapshot) {
+           
             if(!snapshot.hasData) return LoginWidget();
             if(snapshot.data != "") {
               var str = snapshot.data.toString();

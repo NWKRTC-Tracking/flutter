@@ -1,4 +1,5 @@
 
+
 import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/home.dart';
 import 'package:bus_tracking/pages/location.dart';
@@ -21,24 +22,9 @@ import 'package:uni_links/uni_links.dart';
 
 final storage = FlutterSecureStorage();
 
+
 void main() {
 
-  //Deleting all keys in storage based on inactivity
-  var curTime = DateTime.now().millisecondsSinceEpoch;
-  storage.read(key: 'timeStamp').then((value){
-    if(value != ""){
-      var prev = DateTime.fromMillisecondsSinceEpoch(int.parse(value!));
-      var cur = DateTime.fromMillisecondsSinceEpoch(curTime);
-      DateTime dt1 = DateTime.parse(cur.toString());
-      DateTime dt2 = DateTime.parse(prev.toString());
-      Duration diff = dt1.difference(dt2);
-      if(diff.inHours > 5){
-        storage.deleteAll();
-        storage.write(key: 'timeStamp',value: curTime.toString());
-      }
-    }
-    storage.write(key: 'timeStamp',value: curTime.toString());
-  });
   
   
   runApp(MaterialApp(

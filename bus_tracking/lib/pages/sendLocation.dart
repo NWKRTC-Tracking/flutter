@@ -322,6 +322,14 @@ class _sendLocationState extends State<sendLocation> {
   }
 
 
+    void _storeTime()async{
+      // print('store time function');
+    if(isTripStarted){
+      var curTime = DateTime.now().millisecondsSinceEpoch;
+      await storage.write(key: 'timeStamp',value: curTime.toString());
+    }
+    
+    }
 
 
 
@@ -358,11 +366,15 @@ class _sendLocationState extends State<sendLocation> {
             Expanded(
               child: Center(
                 child: ElevatedButton(onPressed:(){
+                    // print('time stamp storing');
+                    
+
                     isTripStarted ? _stopForegroundTask(): _startForegroundTask();
               
                     setState(() {
                       isTripStarted = !isTripStarted;
                     });
+                    _storeTime();
                   }
                 , child:  Text(isTripStarted ? "Stop":"Start", style: TextStyle(
                   fontSize: 20,

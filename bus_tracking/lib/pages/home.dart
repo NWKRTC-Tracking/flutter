@@ -11,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uni_links/uni_links.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -26,13 +25,29 @@ bool _initialURILinkHandled = false;
 
 class _HomeState extends State<Home> {
 
+  void _autoLogOut(String value){
+    var curTime = DateTime.now().millisecondsSinceEpoch;
+    var prev = DateTime.fromMillisecondsSinceEpoch(int.parse(value));
+    var cur = DateTime.fromMillisecondsSinceEpoch(curTime);
+    DateTime dt1 = DateTime.parse(cur.toString());
+    DateTime dt2 = DateTime.parse(prev.toString());
+    Duration diff = dt1.difference(dt2);
+    if(diff.inHours.toInt() >= 15){
+      storage.deleteAll();
+    }
+  }
+
+
+
   @override
   void initState() {
     // var curTime = DateTime.now().millisecondsSinceEpoch;
     // storage.write(key: 'timeStamp',value: curTime.toString());
     super.initState();
+  // _autoLogOut();
   _initURIHandler();
   _incomingLinkHandler();
+  // _storeTime();
     // _locationController = StreamController();
   }
 
@@ -135,8 +150,9 @@ class _HomeState extends State<Home> {
   // }
 
   @override
-  void dispose() {
+  void dispose()async{
   _streamSubscription?.cancel();
+  // await _storeTime();
   super.dispose();
   }
 
@@ -152,6 +168,14 @@ class _HomeState extends State<Home> {
         title: Text('HOME'),
         actions: [
           FlatButton.icon(onPressed: (){
+             print('login button');
+            storage.read(key: 'timeStamp').then((value){
+              if(value != null){
+                print('value not null');
+                _autoLogOut(value);
+              }
+            });
+            // ignore: use_build_context_synchronously
             Navigator.pushNamed(context, '/login');
           }, 
           icon: Icon(
