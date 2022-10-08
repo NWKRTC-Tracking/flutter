@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:bus_tracking/config/url.dart';
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/location.dart';
@@ -129,7 +130,7 @@ class _HomeState extends State<Home> {
     final msg = jsonEncode({"number":phoneNo,"bus_no":busNo});
       Map<String,String> headers = {'Content-Type':'application/json'};
     var response = await http.post(
-      Uri.parse('http://10.196.7.251:8080/api/get-key/'),
+      Uri.parse(getUrl() +  'api/get-key/'),
       headers: headers,
       body: msg,
     );

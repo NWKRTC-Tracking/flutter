@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bus_tracking/presentation/my_flutter_app_icons.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -8,6 +9,7 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
 import 'package:latlong2/latlong.dart';
+import'../presentation/my_flutter_app_icons.dart';
 
 class displayMap extends StatefulWidget {
   double lat, long;
@@ -20,7 +22,7 @@ class displayMap extends StatefulWidget {
 class _displayMapState extends State<displayMap> {
   final PopupController _popupController = PopupController();
   MapController _mapController = MapController();
-  final double _zoom = 7;
+  final double _zoom = 14;
   // double latitude = 0, longitude = 0;
 
   //   final List<LatLng> _latLngList = [
@@ -52,7 +54,7 @@ class _displayMapState extends State<displayMap> {
               width: 60,
               height: 60,
               builder: (context) => const Icon(
-                Icons.pin_drop,
+                MyFlutterApp.location_on,
                 size: 60,
                 color: Colors.blueAccent,
               ),
@@ -82,7 +84,7 @@ class _displayMapState extends State<displayMap> {
                   width: 60,
                   height: 60,
                   builder: (context) => const Icon(
-                    Icons.bus_alert,
+                    MyFlutterApp.location_on,
                     size: 60,
                     color: Colors.redAccent,
                   ),
@@ -164,7 +166,7 @@ class _displayMapState extends State<displayMap> {
                     // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
                     _mapController.moveAndRotate(LatLng(widget.lat,widget.long), _zoom, 0.0);
                   },
-                  child: Icon(Icons.pin_drop)
+                  child: Icon(MyFlutterApp.my_location)
                 ),
               ),
           ),

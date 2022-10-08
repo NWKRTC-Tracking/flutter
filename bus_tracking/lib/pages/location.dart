@@ -11,7 +11,7 @@ import '../config/url.dart';
 
 
 // final String url = "http://10.196.9.48:8080/api/location/";
-String url = "http://10.196.7.251:8080/api/location/";
+String url = getUrl() + "api/location/";
 
 
 class Location extends StatefulWidget {
