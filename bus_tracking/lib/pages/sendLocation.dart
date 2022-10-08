@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:http/http.dart' as http;
 import 'package:bus_tracking/config/url.dart';
+import 'package:intl/intl.dart';
 
 
 @pragma('vm:entry-point')
@@ -116,18 +117,21 @@ class FirstTaskHandler extends TaskHandler {
       };
 
 
-      data =  await sendLocation(data);
-
+      
+      print(data['time'] - data['start_time' ] + 31159359527 - 1200000 );
       // check if 15 hours have happend, if so delete the trip and stop the foreground service.
       if( data['time'] - data['start_time' ] > 54000000){
-        FlutterForegroundTask.stopService();
-        storage.delete(key: "tripId");
-        storage.delete(key: "startTime");
+        sendPort?.send("15 hours over");
+        await FlutterForegroundTask.stopService();
+        await storage.delete(key: "tripId");
+        await storage.delete(key: "startTime");
+        
       }
       FlutterForegroundTask.updateService(
         notificationTitle: 'My Location',
         notificationText: '${event.latitude}, ${event.longitude}',
       );
+      data =  await sendLocation(data);
 
       // Send data to the main isolate.
       // print(event);
@@ -182,9 +186,9 @@ class _sendLocationState extends State<sendLocation> {
   // late StreamSubscription<double> streamLat;
 
   double lat = 0, long = 0;
-  int lastSentTime = 0;
+  int? lastSentTime, departureTime;
   bool isTripStarted = false, isTripThere = false;
-  String? token, phoneNo, jwt;
+  String? token, phoneNo, jwt, busNo;
   Timer? timer;
   ReceivePort? _receivePort;
 
@@ -321,11 +325,15 @@ class _sendLocationState extends State<sendLocation> {
     if(response.statusCode == 200){
 
       Map tripDetails = jsonDecode(response.body);
+      print(tripDetails);
       storage.write(key: "tripId", value: tripDetails['trip_id']);
       storage.write(key: "startTime", value: DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch.toString() );
 
       setState(() {
         isTripThere = true;
+        departureTime = DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch;
+        print(tripDetails['bus_no']);
+        busNo = tripDetails['bus_no'];
       });
       timer?.cancel();
 
@@ -366,6 +374,14 @@ class _sendLocationState extends State<sendLocation> {
         } else if (message is String) {
           if (message == 'onNotificationPressed') {
             Navigator.of(context).pushNamed('/resume-route');
+          }
+          if(message == "15 hours over"){
+
+            setState(() {
+              isTripThere = false;
+              isTripStarted = false;
+            });
+            startgetTripsTimer();
           }
         }
       });
@@ -475,15 +491,29 @@ class _sendLocationState extends State<sendLocation> {
   Widget buildFetchTrips(){
     return Scaffold(
       appBar: AppBar(title: Text("Send Your Location")),
-      body: Column(children: [
-        Expanded(child: Text(
-          "You don't have any Trips yet"
-        ),
-        )
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+         Center(
+           child: Text(
+            "You don't have any Trips yet"
+                 ),
+         ),
+        Text("Trips will be fetched agian in $fetchTripsIn seconds"),
+        ElevatedButton(onPressed: (){
+          setState(() {
+            fetchTripsIn = FetchFrequency;
+          });
+          getTrips();
+        }, child: Text("Refresh"))
       ]),
     );
   }
 
+  String  formatTime(int lastSentTime){
+      return DateFormat.Hms().format(DateTime.fromMillisecondsSinceEpoch(lastSentTime));  
+  }
 
   Widget buildSendLocation(){
     return WithForegroundTask(
@@ -520,30 +550,20 @@ class _sendLocationState extends State<sendLocation> {
 
             Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: 20,),
                   SizedBox(height: 20,),
-
-                  Row(
-                    children: [
-                      Text("Latitude")
-                      ,Text('$lat')
-                      ],
-                  ),
-                  
+                  TableRow( label: "Latitude" ,value: lat.toString()),
                   SizedBox(height: 20,),
-                  Row(
-                      children: [
-                        Text("Longitude"),
-                        Text('$long')
-                        ]
-                    ),
+                  TableRow( label: "Latitude" ,value: long.toString()),
                   SizedBox(height: 20,),
-                  
-                  Row(children: [
-                    Text("Last sent time:"),
-                    Text(DateTime.fromMillisecondsSinceEpoch(lastSentTime).toString()),
-                  ],)
+                  TableRow( label: "Last sent time" ,value: lastSentTime == null? "0" :formatTime(lastSentTime!)),
+                  SizedBox(height: 20,),
+                  TableRow(label: "Bus No", value: busNo.toString()),
+                  SizedBox(height: 20,),
+                  TableRow(label: "Departure Time", value: departureTime == null ? "0" :formatTime(departureTime!)),
                 ],
               ),
             )
@@ -552,6 +572,28 @@ class _sendLocationState extends State<sendLocation> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class TableRow extends StatelessWidget {
+  const TableRow({
+    Key? key,
+    required this.label,
+    required this.value,
+  }) : super(key: key);
+
+  final String value, label;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Text("$label"),
+        Text('$value')
+        ],
     );
   }
 }
