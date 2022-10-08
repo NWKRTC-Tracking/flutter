@@ -356,56 +356,69 @@ class _sendLocationState extends State<sendLocation> {
   Widget build(BuildContext context) {
     return WithForegroundTask(
 
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Send'),
-        ),
-        body: Column(
-
-          children: <Widget>[
-            Expanded(
-              child: Center(
-                child: ElevatedButton(onPressed:(){
-                    // print('time stamp storing');
-                    
-
-                    isTripStarted ? _stopForegroundTask(): _startForegroundTask();
-              
-                    setState(() {
-                      isTripStarted = !isTripStarted;
-                    });
-                    _storeTime();
-                  }
-                , child:  Text(isTripStarted ? "Stop":"Start", style: TextStyle(
-                  fontSize: 20,
-              
-              
-                ),),
-                style: ElevatedButton.styleFrom(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.blueGrey[800],
+            title: Text('NWKRTC'),
+            centerTitle: true,
+            actions: [
+              FlatButton.icon(onPressed: (){
+                storage.deleteAll();
+                Navigator.pushReplacementNamed(context, '/');
+              }, 
+              icon: Icon(Icons.logout,color: Colors.white,
+              ), 
+              label: Text('logout',style: TextStyle(color: Colors.white),))
+            ],
+          ),
+          body: Column(
+      
+            children: <Widget>[
+              Expanded(
+                child: Center(
+                  child: ElevatedButton(onPressed:(){
+                      // print('time stamp storing');
+                      
+      
+                      isTripStarted ? _stopForegroundTask(): _startForegroundTask();
                 
-                  primary: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(50),
-                ),
+                      setState(() {
+                        isTripStarted = !isTripStarted;
+                      });
+                      _storeTime();
+                    }
+                  , child:  Text(isTripStarted ? "Stop":"Start", style: TextStyle(
+                    fontSize: 20,
                 
+                
+                  ),),
+                  style: ElevatedButton.styleFrom(
+                  
+                    primary: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(50),
+                  ),
+                  
+                  ),
                 ),
               ),
-            ),
-
-            Expanded(
-              child: Column(
-                children: [
-                  SizedBox(height: 20,),
-                  SizedBox(height: 20,),
-                  Text('$lat'),
-                  SizedBox(height: 20,),
-                  Text('$long'),
-                ],
-              ),
-            )
-            
-            
-          ],
+      
+              Expanded(
+                child: Column(
+                  children: [
+                    SizedBox(height: 20,),
+                    SizedBox(height: 20,),
+                    Text('$lat'),
+                    SizedBox(height: 20,),
+                    Text('$long'),
+                  ],
+                ),
+              )
+              
+              
+            ],
+          ),
         ),
       ),
     );

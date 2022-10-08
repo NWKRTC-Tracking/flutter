@@ -37,7 +37,7 @@ void main() {
     },
     onGenerateRoute: (settings) {
           if (settings.name == Location.routeName) {
-            locationKey? args = (settings.arguments?? locationKey("")) as locationKey?;
+            locationKey? args = (settings.arguments?? locationKey("","")) as locationKey?;
             if(args!.key == ""){
               print('apikey null in main');
               return MaterialPageRoute(builder: (context){
@@ -49,6 +49,7 @@ void main() {
               builder: (context) {
                 return Location(
                   apiKey: args!.key,
+                  busNo: args.busNo,
                 );
               },
             );

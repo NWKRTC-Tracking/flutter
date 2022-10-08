@@ -126,11 +126,12 @@ class _HomeState extends State<Home> {
     }
   }
   }
+  String errorMsg = "Invalid Data";
   Future<String?> isValidData(String phoneNo, String busNo) async {
     final msg = jsonEncode({"number":phoneNo,"bus_no":busNo});
       Map<String,String> headers = {'Content-Type':'application/json'};
     var response = await http.post(
-      Uri.parse(getUrl() +  'api/get-key/'),
+      Uri.parse(getUrl() +  'get-key/'),
       headers: headers,
       body: msg,
     );
@@ -140,7 +141,15 @@ class _HomeState extends State<Home> {
       //   apiKey = jsonDecode(response.body)['key'].toString();
       // });
       return jsonDecode(response.body)['key'].toString();
-      }
+    }
+    setState(() { 
+      errorMsg = jsonDecode(response.body)['message'].toString();
+    });
+    if(errorMsg == "null"){
+      setState(() {
+        errorMsg = "Invalid Data";
+      });
+    }
     return null;
   }
   // @override
@@ -163,84 +172,128 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        title: Text('HOME'),
-        actions: [
-          FlatButton.icon(onPressed: (){
-             print('login button');
-            storage.read(key: 'timeStamp').then((value){
-              if(value != null){
-                print('value not null');
-                _autoLogOut(value);
-              }
-            });
-            // ignore: use_build_context_synchronously
-            Navigator.pushNamed(context, '/login');
-          }, 
-          icon: Icon(
-            Icons.login
-          ), label: Text('Login'))
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                'Track Bus',
-                style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 30),
-              )),
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: TextField(
-              controller: phoneNoController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Conductor Number',
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: AppBar(
+          backgroundColor: Colors.blueGrey[800],
+          // backgroundColor: Color.fromARGB(255, 193, 72, 31),
+          title: Text('NWKRTC'),
+          centerTitle: true,
+          actions: [
+            FlatButton.icon(onPressed: (){
+               print('login button');
+              storage.read(key: 'timeStamp').then((value){
+                if(value != null){
+                  print('value not null');
+                  _autoLogOut(value);
+                }
+              });
+              // ignore: use_build_context_synchronously
+              Navigator.pushNamed(context, '/login');
+            }, 
+            icon: Icon(
+              Icons.login,
+              color: Colors.white,
+            ), label: Text('Login',style: TextStyle(color: Colors.white),),)
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: <Widget>[
+              Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Track Bus',
+                    style: TextStyle(
+                        color:  Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 30),
+                  )),
+              Container(
+                padding: const EdgeInsets.all(15),
+                child: TextField(
+                 keyboardType: TextInputType.number,
+                  controller: phoneNoController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Conductor Number',
+                    
+                  ),
+                ),
               ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-            child: TextField(
-              controller: busNameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Bus No',
+              Container(
+                padding: const EdgeInsets.all(15),
+                child: TextField(
+                  controller: busNameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Bus No',
+                  ),
+                ),
               ),
-            ),
-          ),
-          SizedBox(height: 20,),
-          Container(
-              height: 50,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: ElevatedButton(
-                child: const Text('Track'),
-                onPressed: () async {
-                  var phoneNo = phoneNoController.text.toString();
-                  var busNo = busNameController.text.toString();
-                  print(phoneNo+" "+busNo);
-                  // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
-                  var apiKey = await isValidData(phoneNo, busNo);
-                  if(apiKey != null) {
-                    Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey));
-                  } else {
-                    print('else part');
-                    AlertDialog(
-                      content: Text('Error occured'),
-                    );
-                  }
-                },
+              SizedBox(height: 20,),
+              Container(
+                  height: 50,
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
+                    child: const Text('Track'),
+                  
+                    onPressed: () async {
+                      var phoneNo = phoneNoController.text.toString();
+                      var busNo = busNameController.text.toString();
+                      print(phoneNo+" "+busNo);
+                      // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
+                      var apiKey = await isValidData(phoneNo, busNo);
+                      if(apiKey != null && apiKey != "null") {
+                        print('apikey');
+                        print(apiKey);
+                        Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
+                      } else {
+                        // AlertDialog(
+                        //   content: Text('Error occured'),
+                        // );
+                        showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          // backgroundColor: Colors.redAccent[300],
+                          
+                          elevation: 1.0,
+                          title:  Center(child: Text(errorMsg)),
+                          // content:  Row(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   crossAxisAlignment: CrossAxisAlignment.center,
+                          //   children : <Widget>[
+                          //     Expanded(
+                          //       child: Text(
+                          //         'Invalid Data',
+                          //         textAlign: TextAlign.center,
+                                  
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),                      
+                          actionsAlignment: MainAxisAlignment.center,
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, 'OK'),
+                              child: const Text('OK',style: TextStyle(color: Color.fromARGB(255, 39, 91, 42)),),
+                            ),
+                          ],
+                        ),
+                        );
+                    
+                      }
+                    },
+                  )
               )
-          )
-        ]
-      )
+            ]
+          ),
+        )
+      ),
     );
   }
 }

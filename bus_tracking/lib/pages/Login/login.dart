@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bus_tracking/config/url.dart';
 import 'package:bus_tracking/pages/sendLocationCheck.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -19,6 +20,7 @@ class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
  
   static const String _title = 'NWKRTC';
+
 
  
   @override
@@ -67,12 +69,13 @@ class _LoginWidgetState extends State<LoginWidget> {
   TextEditingController passwordController = TextEditingController();
 
   late String token;
+  String errorMsg = "Invalid Credentials";
 
   Future<String?> attemptLogIn(String phoneNo, String password) async {
     final msg = jsonEncode({"phoneNo":phoneNo,"password":password,});
       Map<String,String> headers = {'Content-Type':'application/json'};
     var response = await post(
-      Uri.parse('http://10.196.8.80:80/api/login/'),
+      Uri.parse(getUrl()+'login/'),
       headers: headers,
       body: msg,
     );
@@ -83,84 +86,121 @@ class _LoginWidgetState extends State<LoginWidget> {
         token = jsonDecode(response.body)['token'].toString();
       });
       return response.body;
-      }
+    }
+    setState(() {
+      errorMsg = jsonDecode(response.body)['message'].toString();
+    });
+    if(errorMsg == null){
+      setState(() {
+        errorMsg = "Invalid Data";
+      });
+      
+    }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('NWKRTC'),
-        centerTitle: true,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blueGrey[800],
+          title: Text('NWKRTC'),
+          centerTitle: true,
+        ),
+        body: Padding(
+            padding: const EdgeInsets.all(10),
+            child: ListView(
+              children: <Widget>[
+                Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(10),
+                    child: const Text(
+                      'LOGIN',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 30),
+                    )),
+                Container(
+                  padding: const EdgeInsets.all(15.0),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Mobile No',
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(15.0),
+                  child: TextField(
+                    obscureText: true,
+                    controller: passwordController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Password',
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Container(
+                    height: 80,
+                    padding: const EdgeInsets.all(15.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
+                      child: const Text('Login'),
+                      onPressed: () async {
+                        var username = nameController.text.toString();
+                        var password = passwordController.text.toString();
+                        var jwt = await attemptLogIn(username, password);
+                        if(jwt != null) {
+                          await storage.write(key: "token", value: token);
+                          await storage.write(key: "jwt", value: jwt);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => sendLocationCheck(),
+                            )
+                          );
+                        } else {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              // backgroundColor: Colors.redAccent[300],
+                              
+                              elevation: 1.0,
+                              title:  Center(child: Text(errorMsg)),
+                              // content:  Row(
+                              //   mainAxisAlignment: MainAxisAlignment.center,
+                              //   crossAxisAlignment: CrossAxisAlignment.center,
+                              //   children : <Widget>[
+                              //     Expanded(
+                              //       child: Text(
+                              //         'Invalid Credentials',
+                              //         textAlign: TextAlign.center,
+                                      
+                              //       ),
+                              //     )
+                              //   ],
+                              // ),                      
+                              actionsAlignment: MainAxisAlignment.center,
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, 'OK'),
+                                  child: const Text('OK',style: TextStyle(color:Colors.black),),
+                                ),
+                              ],
+                            ),
+                            );
+                          }
+                      },
+                    )
+                ),
+              ],
+            )),
       ),
-      body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: ListView(
-            children: <Widget>[
-              Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(10),
-                  child: const Text(
-                    'Log In',
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 30),
-                  )),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Mobile No',
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                child: TextField(
-                  obscureText: true,
-                  controller: passwordController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  //forgot password screen
-                },
-                child: const Text('Forgot Password',),
-              ),
-              Container(
-                  height: 50,
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  child: ElevatedButton(
-                    child: const Text('Login'),
-                    onPressed: () async {
-                      var username = nameController.text.toString();
-                      var password = passwordController.text.toString();
-                      var jwt = await attemptLogIn(username, password);
-                      if(jwt != null) {
-                        await storage.write(key: "token", value: token);
-                        await storage.write(key: "jwt", value: jwt);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => sendLocationCheck(),
-                          )
-                        );
-                      } else {
-                        AlertDialog(semanticLabel: "An Error Occurred No account was found matching that username and password");
-                      }
-                    },
-                  )
-              ),
-            ],
-          )),
     );
   }
 }
