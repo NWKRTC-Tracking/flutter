@@ -27,42 +27,51 @@ class FirstTaskHandler extends TaskHandler {
 
   StreamSubscription<Location>? _streamSubscription;
   String? token, tripId, jwt;
-  int? zeroError;
+  int? zeroError, startTime;
+  
+
+  
 
   Future<Map> sendLocation(Map data) async {
     int beforeSending =  DateTime.now().millisecondsSinceEpoch;
 
+    print(data);
     var url = '${getUrl()}api/location';
     //encode Map to JSON
     var body = json.encode(data);
 
-    var response = await Future.delayed(Duration(seconds: 1));
+    // data['statusCode'] = 200;
+    // data['lastSentTime'] = DateTime.now().millisecondsSinceEpoch;
+    
+    // try {
 
-    data['statusCode'] = 200;
-    data['lastSentTime'] = DateTime.now().millisecondsSinceEpoch;
+    //   print(data);
+  
+      var response = await http.post(Uri.parse(url),
+      headers: {"Content-Type": "application/json", "Authorization":"Bearer $token"}, body: body);
+      print("status Code: ${response.statusCode}");
+      data['statusCode'] = response.statusCode;
 
-    return data;
-
-    // var response = await http.post(Uri.parse(url),
-    //     headers: {"Content-Type": "application/json", "Authorization":"Bearer $token"}, body: body);
-    // print("${response.statusCode}");
-
-    // print(response.body.runtimeType);
-
-    // if (response.statusCode == 200) {
-    //   data['statusCode'] = response.statusCode;
-    //   data['delay'] =  DateTime.now().millisecondsSinceEpoch+ -beforeSending;
-    //   print("status code is 200");
-    //   return data;
-    // } else {
       
-    //   print("Exception caught: Failed to get data");
-    //   FlutterForegroundTask.stopService();
-    //   return data;
+
+      // if (response.statusCode == 200) {
+      //   print("response is 200");
+
+      //   data['lastSentTime'] = beforeSending;
+      //   data['delay'] =  jsonDecode(response.body)["delay"];
+      //   print("status code is 200");
+      //   return data;
+      // } else {
+        
+      //   print("Exception caught: Failed to get data");
+      //   FlutterForegroundTask.stopService();
+      //   return data;
+      // }
+    // } catch (e) {
+    //   print(e); 
     // }
 
-
-    
+    return data;
   }
 
  
@@ -81,26 +90,40 @@ class FirstTaskHandler extends TaskHandler {
     storage.read(key: "token").then((value){
       token = value;
     });
-    storage.read(key: "zero_error").then((value) {
+    
+    storage.read(key: "zeroError").then((value) {
       zeroError = int.parse(value!);
     });
 
+     storage.read(key: "startTime").then((value) {
+      startTime = int.parse(value!);
+
+    });
     _streamSubscription = FlLocation.getLocationStream().listen((event) async {
 
       // controllerLat.add(event.latitude);
       print("inside the stream");
       int currentTime =  DateTime.now().millisecondsSinceEpoch;
-      
+
+          
       Map data = {
         'latitude': event.latitude,
         'longitude': event.longitude,
-        "start_time": currentTime,
+        "start_time": startTime,
         "time": currentTime,
         'key': tripId,
         "zero_error" : zeroError
       };
+
+
       data =  await sendLocation(data);
 
+      // check if 15 hours have happend, if so delete the trip and stop the foreground service.
+      if( data['time'] - data['start_time' ] > 54000000){
+        FlutterForegroundTask.stopService();
+        storage.delete(key: "tripId");
+        storage.delete(key: "startTime");
+      }
       FlutterForegroundTask.updateService(
         notificationTitle: 'My Location',
         notificationText: '${event.latitude}, ${event.longitude}',
@@ -159,7 +182,12 @@ class _sendLocationState extends State<sendLocation> {
   // late StreamSubscription<double> streamLat;
 
   double lat = 0, long = 0;
-  bool isTripStarted = false;
+  int lastSentTime = 0;
+  bool isTripStarted = false, isTripThere = false;
+  String? token, phoneNo, jwt;
+  Timer? timer;
+  ReceivePort? _receivePort;
+
 
 
    Future<bool> _checkAndRequestPermission({bool? background}) async {
@@ -220,7 +248,7 @@ class _sendLocationState extends State<sendLocation> {
     );
   }
 
-  ReceivePort? _receivePort;
+  
 
   // ...
   Future<bool> _stopForegroundTask() async {
@@ -260,6 +288,63 @@ class _sendLocationState extends State<sendLocation> {
     return _registerReceivePort(receivePort);
   }
 
+  
+  int FetchFrequency = 5;
+  int fetchTripsIn = 5;
+  
+  void decrementfetchTripsIn(){
+    setState(() {
+      // decrease timer
+       fetchTripsIn--;
+    });
+  }
+
+  void resetTime(){
+    setState(() {
+      fetchTripsIn = FetchFrequency;
+    });
+  }
+
+  
+  Future<void> getTrips() async {
+
+    var url = "${getUrl()}api/generated/$phoneNo";
+    var uri = Uri.parse(url);
+    print(url);
+    print(uri);
+    var response = await http.get(
+      uri,
+      headers: {"Authorization":"Bearer $token"}
+      );
+    
+    print(response.statusCode);
+    if(response.statusCode == 200){
+
+      Map tripDetails = jsonDecode(response.body);
+      storage.write(key: "tripId", value: tripDetails['trip_id']);
+      storage.write(key: "startTime", value: DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch.toString() );
+
+      setState(() {
+        isTripThere = true;
+      });
+      timer?.cancel();
+
+    }
+
+  }
+
+  void getTripsTimer(){
+    print(fetchTripsIn);
+    decrementfetchTripsIn();
+    if(fetchTripsIn==0){
+        // after the given freq get the trips.
+        getTrips();
+        resetTime();
+        // get trips will set the timer.
+      }
+  }
+      
+
   bool _registerReceivePort(ReceivePort? receivePort) {
     _closeReceivePort();
 
@@ -268,10 +353,14 @@ class _sendLocationState extends State<sendLocation> {
       _receivePort?.listen((message) {
         print('message');
         print(message);
-        setState(() {
+
+        if(message is Map){
+          setState(() {
           lat = message['latitude'];
           long = message['longitude'];
-        });
+          if(message.containsKey("statusCode") && message['statusCode']== 200)  lastSentTime = DateTime.now().millisecondsSinceEpoch;
+          });
+        }
         if (message is DateTime) {
           print('timestamp: ${message.toString()}');
         } else if (message is String) {
@@ -292,14 +381,49 @@ class _sendLocationState extends State<sendLocation> {
     _receivePort = null;
   }
 
+  void startgetTripsTimer(){
+    storage.read(key: "token").then(((value){
+        setState(() {
+          token = value;
+        });
+      }));
+
+      storage.read(key: "jwt").then((value){
+        setState(() {
+          jwt = value;
+        });
+        print("jwt");
+        print(jwt);
+        var jwtspit = jwt!.split(".");
+        var payload = json.decode(ascii.decode(base64.decode(base64.normalize(jwtspit[1]))));
+        print(payload);
+        setState(() {
+          phoneNo = payload['sub']; 
+        });
+      });
+      
+      
+      getTrips();
+      timer = Timer.periodic(Duration(seconds: 1), (Timer t) => getTripsTimer());
+  }
+  
+
   @override
   void initState() {
     _checkAndRequestPermission();
     super.initState();
 
-    storage.write(key: "tripId", value: "d99b9824f405f1385c23907d70192d5cc57bce60");
-    storage.write(key: "zeroError",value: "1234");
-    storage.write(key: "startTime", value: "1664948125000");
+    print(storage.delete(key: "tripId"));
+    print("init state");
+
+    storage.containsKey(key: "tripId").then((value){
+      print(value);
+      if(value){
+        setState(() {
+          isTripThere = true;
+        });
+      }
+    });
 
     _initForegroundTask();
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
@@ -314,11 +438,11 @@ class _sendLocationState extends State<sendLocation> {
         _registerReceivePort(newReceivePort);
       }
     });
-    // Stream stream = controllerLat.stream;
-      // streamLat = controllerLat.stream.listen((event) {
-      //     print('listener');
-      //   print(event);
-      // });
+
+    if(!isTripThere){
+      startgetTripsTimer();
+    }
+
   }
 
 
@@ -328,6 +452,7 @@ class _sendLocationState extends State<sendLocation> {
   @override
   void dispose() {
     _closeReceivePort();
+    timer?.cancel();
     super.dispose();
     // streamLat.cancel();
   }
@@ -346,6 +471,23 @@ class _sendLocationState extends State<sendLocation> {
 
   @override
   Widget build(BuildContext context) {
+    return isTripThere ? buildSendLocation() : buildFetchTrips();
+  }
+
+  Widget buildFetchTrips(){
+    return Scaffold(
+      appBar: AppBar(title: Text("Send Your Location")),
+      body: Column(children: [
+        Expanded(child: Text(
+          "You don't have any Trips yet"
+        ),
+        )
+      ]),
+    );
+  }
+
+
+  Widget buildSendLocation(){
     return WithForegroundTask(
 
       child: Scaffold(
@@ -364,16 +506,14 @@ class _sendLocationState extends State<sendLocation> {
                       isTripStarted = !isTripStarted;
                     });
                   }
-                , child:  Text(isTripStarted ? "Stop":"Start", style: TextStyle(
-                  fontSize: 20,
-              
-              
+                , child:  Text(isTripStarted ? "STOP":"START", style: TextStyle(
+                  fontSize: 40,
                 ),),
                 style: ElevatedButton.styleFrom(
                 
                   primary: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
                   shape: CircleBorder(),
-                  padding: EdgeInsets.all(50),
+                  padding: EdgeInsets.all(80),
                 ),
                 
                 ),
@@ -385,9 +525,27 @@ class _sendLocationState extends State<sendLocation> {
                 children: [
                   SizedBox(height: 20,),
                   SizedBox(height: 20,),
-                  Text('$lat'),
+
+                  Row(
+                    children: [
+                      Text("Latitude")
+                      ,Text('$lat')
+                      ],
+                  ),
+                  
                   SizedBox(height: 20,),
-                  Text('$long'),
+                  Row(
+                      children: [
+                        Text("Longitude"),
+                        Text('$long')
+                        ]
+                    ),
+                  SizedBox(height: 20,),
+                  
+                  Row(children: [
+                    Text("Last sent time:"),
+                    Text(DateTime.fromMillisecondsSinceEpoch(lastSentTime).toString()),
+                  ],)
                 ],
               ),
             )
