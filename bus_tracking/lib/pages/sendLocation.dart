@@ -413,12 +413,10 @@ class _sendLocationState extends State<sendLocation> {
     _checkAndRequestPermission();
     super.initState();
 
-    print(storage.delete(key: "tripId"));
-    print("init state");
+   
 
-    storage.containsKey(key: "tripId").then((value){
-      print(value);
-      if(value){
+    storage.read(key: "tripId").then((value){
+      if(value != null){
         setState(() {
           isTripThere = true;
         });
