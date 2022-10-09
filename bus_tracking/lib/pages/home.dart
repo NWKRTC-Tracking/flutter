@@ -4,6 +4,7 @@ import 'package:bus_tracking/config/url.dart';
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/models/logo.dart';
+import 'package:bus_tracking/models/spinner.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/foundation.dart';
@@ -140,16 +141,22 @@ class _HomeState extends State<Home> {
       // setState(() {
       //   apiKey = jsonDecode(response.body)['key'].toString();
       // });
+      setState(() {
+        _isTrackPressed = false;
+      });
       return jsonDecode(response.body)['key'].toString();
+    
     }
     setState(() { 
       errorMsg = jsonDecode(response.body)['message'].toString();
+      _isTrackPressed = false;
     });
     if(errorMsg == "null"){
       setState(() {
         errorMsg = "Invalid Data";
       });
     }
+
     return null;
   }
   // @override
@@ -169,10 +176,11 @@ class _HomeState extends State<Home> {
   TextEditingController phoneNoController = TextEditingController();
   TextEditingController busNameController = TextEditingController();
 
+  bool _isTrackPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return _isTrackPressed ? CustomSpinnerWithTitle : SafeArea(
       child: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -265,11 +273,16 @@ class _HomeState extends State<Home> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
                         child: const Text('Track'),
-                      
+                        
                         onPressed: () async {
                           var phoneNo = phoneNoController.text.toString();
                           var busNo = busNameController.text.toString();
                           print(phoneNo+" "+busNo);
+
+                          //Spinner
+                          setState(() {
+                            _isTrackPressed = true;
+                          });
                           // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
                           var apiKey = await isValidData(phoneNo, busNo);
                           if(apiKey != null && apiKey != "null") {

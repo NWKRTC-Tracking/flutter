@@ -149,7 +149,8 @@ class _LocationState extends State<Location> {
                 );
               }
               else{
-                return CustomSpinner;
+                // return CustomSpinner;
+                return CustomSpinnerWithTitle;
               }
             }),
       ),

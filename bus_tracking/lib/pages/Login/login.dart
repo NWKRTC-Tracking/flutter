@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bus_tracking/config/url.dart';
 import 'package:bus_tracking/models/logo.dart';
+import 'package:bus_tracking/models/spinner.dart';
 import 'package:bus_tracking/pages/sendLocationCheck.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -68,7 +69,7 @@ class LoginWidget extends StatefulWidget {
 class _LoginWidgetState extends State<LoginWidget> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  bool _passwordVisible = false;
+  bool _passwordVisible = false, _isLoginPressed = false;
 
   late String token;
   String errorMsg = "Invalid Credentials";
@@ -86,11 +87,13 @@ class _LoginWidgetState extends State<LoginWidget> {
     if(response.statusCode == 200){ 
       setState(() {
         token = jsonDecode(response.body)['token'].toString();
+        _isLoginPressed = false;
       });
       return response.body;
     }
     setState(() {
       errorMsg = jsonDecode(response.body)['message'].toString();
+      _isLoginPressed = false;
     });
     if(errorMsg == null){
       setState(() {
@@ -103,7 +106,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return _isLoginPressed ? CustomSpinnerWithTitle : SafeArea(
       child: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -190,6 +193,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                           style: ElevatedButton.styleFrom(primary: Colors.blue[800]),
                           child: const Text('Login'),
                           onPressed: () async {
+                            setState(() {
+                              _isLoginPressed = true;
+                            });
                             var username = nameController.text.toString();
                             var password = passwordController.text.toString();
                             var jwt = await attemptLogIn(username, password);

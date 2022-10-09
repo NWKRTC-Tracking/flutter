@@ -520,7 +520,7 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   Widget buildFetchTrips(){
-    return isFetching? CustomSpinner :Scaffold(
+    return isFetching? CustomSpinnerWithTitle :Scaffold(
       appBar: AppBar(
       title: Text("Send Your Location"),
       actions: [

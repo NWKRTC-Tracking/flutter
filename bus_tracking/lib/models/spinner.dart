@@ -11,3 +11,15 @@ final CustomSpinner = SpinKitFadingFour(
     );
   },
 );
+
+final CustomSpinnerWithTitle = SafeArea(
+  child: Scaffold(
+    appBar: AppBar(
+        backgroundColor: Colors.blueGrey[800],
+        title: Text('NWKRTC'),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.grey,
+      body: CustomSpinner,
+  ),
+);
