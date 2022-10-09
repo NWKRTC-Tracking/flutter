@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'package:bus_tracking/main.dart';
+import 'package:bus_tracking/models/spinner.dart';
 import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -139,23 +140,30 @@ class _LocationState extends State<Location> {
                   ],
                 );
               }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
+              else if(message != ""){
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
 
-                  Text(message),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
-                    onPressed: (){
-                    Navigator.pop(context);
-                  }, 
-                  icon:Icon(
-                    Icons.warning
-                  ), 
-                  label: Text('Return to Home'))
-                ],
-              );
+                      Text(message),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
+                        onPressed: (){
+                        Navigator.pop(context);
+                      }, 
+                      icon:Icon(
+                        Icons.warning
+                      ), 
+                      label: Text('Return to Home'))
+                    ],
+                  ),
+                );
+              }
+              else{
+                return CustomSpinner;
+              }
             }),
       ),
     );

@@ -217,8 +217,15 @@ class _HomeState extends State<Home> {
                 child: TextField(
                  keyboardType: TextInputType.number,
                   controller: phoneNoController,
+                  cursorColor: Colors.black,
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        borderSide: BorderSide(width: 1,color: Colors.black),
+                      ),
+                      
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: Colors.black),
                     labelText: 'Conductor Number',
                     
                   ),
@@ -228,8 +235,15 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.all(15),
                 child: TextField(
                   controller: busNameController,
+                  cursorColor: Colors.black,
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        borderSide: BorderSide(width: 1,color: Colors.black),
+                      ),
+                      
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: Colors.black),
                     labelText: 'Bus No',
                   ),
                 ),

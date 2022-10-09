@@ -112,8 +112,10 @@ class _displayMapState extends State<displayMap> {
         child: Scaffold(
           //TODO
           appBar: AppBar(
+            elevation: 5,
+           toolbarHeight: 80,
             backgroundColor: Colors.blueGrey[800],
-            title: Text('Bus No : ${widget.busNo} '),
+            title: Text('Bus No : ${widget.busNo} \nLast updated : '+ widget.delay.toString() + 's ago'),
             centerTitle: true,
           ),
           body: Stack(
@@ -201,18 +203,7 @@ class _displayMapState extends State<displayMap> {
                   ),
                 ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 40, 0,0),
-              child: Align(
-                  alignment: Alignment.center,
-                  // add your floating action button
-                  child: Text('Last updated : '+ widget.delay.toString() + 's ago',
-                  style: TextStyle(
-                    fontSize: 20                               
-                  ),
-                  ),
-                ),
-            ),
+           
             ],
           ),
         ),
