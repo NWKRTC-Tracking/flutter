@@ -39,9 +39,7 @@ class _LocationState extends State<Location> {
   late String token;
 
   Future fetchUser() async {
-
-    final response = await http.get(Uri.parse(url));
-    print(response.body);
+    final response = await http.get(Uri.parse(url+widget.apiKey));
     if (response.statusCode == 200) {
       setState(() {
         message = "";
@@ -62,11 +60,8 @@ class _LocationState extends State<Location> {
     }
     var startTime = DateTime.now().millisecondsSinceEpoch;
     fetchUser().then((res) async {
-      print("${message} message");
       if(res != null){
-        print('came inside fetch');
         _locationController.add(res);
-        print(res);
         var endTime = DateTime.now().millisecondsSinceEpoch;
         var prev = DateTime.fromMillisecondsSinceEpoch(startTime);
         var cur = DateTime.fromMillisecondsSinceEpoch(endTime);
@@ -85,8 +80,6 @@ class _LocationState extends State<Location> {
         setState(() {
           totalDelay = total.toInt();
         });
-        print('tot delay');
-        print(totalDelay);
         return res;   
       }
         
@@ -96,11 +89,6 @@ class _LocationState extends State<Location> {
 
   @override
   void initState() {
-    print(widget.apiKey);
-    // if(widget.apiKey == ""){
-    //   Navigator.pushReplacementNamed(context, '/');
-    // }
-    url += widget.apiKey;
     
     super.initState();
     _locationController = StreamController();
@@ -109,7 +97,6 @@ class _LocationState extends State<Location> {
 
   @override
   void dispose() {
-    print("closed");
     _locationController.close();
     super.dispose();
     _isDisposed = true;
@@ -162,7 +149,8 @@ class _LocationState extends State<Location> {
                 );
               }
               else{
-                return CustomSpinner;
+                // return CustomSpinner;
+                return CustomSpinnerWithTitle;
               }
             }),
       ),

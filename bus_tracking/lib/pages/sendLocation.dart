@@ -540,12 +540,13 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   Widget buildFetchTrips(){
-    return isFetching? CustomSpinner :Scaffold(
+    return isFetching? CustomSpinnerWithTitle :Scaffold(
       appBar: AppBar(
-      title: Text("Send Your Location"),
+      title: Text("NWKRTC"),
       actions: [
                 FlatButton.icon(onPressed: (){
                   storage.deleteAll();
+                  timer?.cancel();
                   Navigator.pushReplacementNamed(context, '/');
                 }, 
                 icon: Icon(Icons.logout,color: Colors.white,

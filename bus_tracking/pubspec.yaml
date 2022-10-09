@@ -81,6 +81,8 @@ flutter:
     - family:  BusLocation
       fonts:
         - asset: fonts/BusLocation.ttf
+  assets:
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
 
