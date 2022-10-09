@@ -253,7 +253,7 @@ class _HomeState extends State<Home> {
                   height: 50,
                   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
+                    style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
                     child: const Text('Track'),
                   
                     onPressed: () async {
@@ -263,8 +263,6 @@ class _HomeState extends State<Home> {
                       // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
                       var apiKey = await isValidData(phoneNo, busNo);
                       if(apiKey != null && apiKey != "null") {
-                        print('apikey');
-                        print(apiKey);
                         Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
                       } else {
                         // AlertDialog(

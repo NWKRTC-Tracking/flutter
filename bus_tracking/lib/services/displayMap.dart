@@ -23,25 +23,11 @@ class displayMap extends StatefulWidget {
 }
 
 class _displayMapState extends State<displayMap> {
+
   final PopupController _popupController = PopupController();
   MapController _mapController = MapController();
-  final double _zoom = 14;
-  // double latitude = 0, longitude = 0;
+  final double _zoom = 12;
 
-  //   final List<LatLng> _latLngList = [
-  //   LatLng(13, 77.5),
-  //   LatLng(13.02, 77.51),
-  //   LatLng(13.05, 77.53),
-  //   LatLng(13.055, 77.54),
-  //   LatLng(13.059, 77.55),
-  //   LatLng(13.07, 77.55),
-  //   LatLng(13.1, 77.5342),
-  //   LatLng(13.12, 77.51),
-  //   LatLng(13.015, 77.53),
-  //   LatLng(13.155, 77.54),
-  //   LatLng(13.159, 77.55),
-  //   LatLng(13.17, 77.55),
-  // ];
   List<LatLng> _latLngList = [];
   List<Marker> _markers = [];
 
@@ -50,7 +36,6 @@ class _displayMapState extends State<displayMap> {
     setState(() {
       _latLngList = [LatLng(widget.lat, widget.long)];
     });
-    // _mapController.move(LatLng(widget.lat, widget.long), _zoom);
     _markers = _latLngList
         .map((pointe) => Marker(
               point: pointe,
@@ -72,16 +57,6 @@ class _displayMapState extends State<displayMap> {
   @override
   Widget build(BuildContext context) {
     if (widget.lat != null) {
-      print('inside');
-      print(widget.lat);
-      // setState(() {
-      //   latitude = widget.lat;
-      //   longitude = widget.long;
-      // });
-      print(_latLngList);
-      // _latLngList.clear();
-      // _latLngList.add(LatLng(widget.lat, widget.long));
-      // print('afeer');
       setState(() {
         _latLngList = [LatLng(widget.lat, widget.long)];
         _markers = _latLngList
@@ -90,22 +65,16 @@ class _displayMapState extends State<displayMap> {
                   width: 60,
                   height: 60,
                   builder: (context) => const Icon(
-                    // Icons.pin_drop,
                     MyFlutterApp.location_on,
                     size: 60,
                     shadows: <Shadow>[Shadow(color: Colors.black, blurRadius: 1.0)],
-                    color: Color.fromARGB(255, 41, 137, 215),
+                    color: Colors.black,
                   ),
                   anchorPos: anchorPos
                   
                 ))
             .toList();
       });
-      print(_latLngList);
-
-      // print(_mapController.center);
-      // print(_mapController.center);
-      // _mapController.move(LatLng(widget.lat, widget.long), _zoom);
     }
     return Expanded(
       child: SafeArea(
@@ -115,7 +84,7 @@ class _displayMapState extends State<displayMap> {
             elevation: 5,
            toolbarHeight: 80,
             backgroundColor: Colors.blueGrey[800],
-            title: Text('Bus No : ${widget.busNo} \nLast updated : '+ widget.delay.toString() + 's ago'),
+            title: Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'),
             centerTitle: true,
           ),
           body: Stack(
@@ -123,14 +92,12 @@ class _displayMapState extends State<displayMap> {
             FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                // swPanBoundary: LatLng(13, 77.5),
-                // nePanBoundary: LatLng(13.07001, 77.58),
+                maxZoom: 18,
+                minZoom: 4,
                 center: _latLngList.elementAt(0),
                 bounds: LatLngBounds.fromPoints(_latLngList),
                 zoom: _zoom,
                 interactiveFlags: InteractiveFlag.all,
-                // onPositionChanged: (position, hasGesture) =>
-                //     {_mapController.move(LatLng(widget.lat, widget.long), _zoom)},
                 plugins: [
                   MarkerClusterPlugin(),
                 ],
@@ -155,10 +122,10 @@ class _displayMapState extends State<displayMap> {
                   
                   ),
                   markers: _markers,
-                  polygonOptions: const PolygonOptions(
-                      borderColor: Colors.blueAccent,
-                      color: Colors.black12,
-                      borderStrokeWidth: 3),
+                  // polygonOptions: const PolygonOptions(
+                  //     borderColor: Colors.blueAccent,
+                  //     color: Colors.black12,
+                  //     borderStrokeWidth: 3),
                   builder: (context, markers) {
                     return Container(
                       alignment: Alignment.center,
@@ -176,7 +143,7 @@ class _displayMapState extends State<displayMap> {
                   alignment: Alignment.bottomRight,
                   // add your floating action button
                   child: FloatingActionButton(
-                    backgroundColor: Colors.blueGrey[800],
+                    backgroundColor: Colors.blue[800],
                     onPressed: () {
                       // print('Location recenter');
                       // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
@@ -192,7 +159,7 @@ class _displayMapState extends State<displayMap> {
                   alignment: Alignment.topRight,
                   // add your floating action button
                   child: FloatingActionButton(
-                    backgroundColor: Colors.blueGrey[800],
+                    backgroundColor: Colors.blue[800],
                     onPressed: () {
                       // print('Location recenter');
                       // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
