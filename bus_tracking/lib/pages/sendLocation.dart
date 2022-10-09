@@ -372,11 +372,24 @@ class _sendLocationState extends State<sendLocation> {
         print(message);
 
         if(message is Map){
-          setState(() {
-          lat = message['latitude'];
-          long = message['longitude'];
-          if(message.containsKey("statusCode") && message['statusCode']== 200)  lastSentTime = DateTime.now().millisecondsSinceEpoch;
-          });
+
+          if(message['statusCode'] == 200){
+            setState(() {
+              lastSentTime = DateTime.now().millisecondsSinceEpoch;
+            });
+          }
+          if(message['statusCode']== 400){
+
+            _stopForegroundTask();
+            setState(() {
+              isTripThere = false;
+              isTripStarted = false;
+            });
+            
+            storage.delete(key: "tripId");
+            storage.delete(key: "lastSentTime");
+            storage.delete(key: "departureTime");
+          }
         }
         if (message is DateTime) {
           print('timestamp: ${message.toString()}');
@@ -462,6 +475,14 @@ class _sendLocationState extends State<sendLocation> {
       }
     });
 
+    storage.read(key: "lastSentTime").then((value){
+      if(value!= null){
+        setState(() {
+          lastSentTime = int.parse(value);
+        });
+      }
+    });
+
     _initForegroundTask();
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       // You can get the previous ReceivePort without restarting the service.
@@ -482,13 +503,12 @@ class _sendLocationState extends State<sendLocation> {
 
   }
 
-
-    void _storeTime()async{
-      // print('store time function');
-    if(isTripStarted){
-      var curTime = DateTime.now().millisecondsSinceEpoch;
-      await storage.write(key: 'timeStamp',value: curTime.toString());
-    }
+  void _storeTime()async{
+    // print('store time function');
+  if(isTripStarted){
+    var curTime = DateTime.now().millisecondsSinceEpoch;
+    await storage.write(key: 'timeStamp',value: curTime.toString());
+  }
     
     }
 
@@ -549,7 +569,7 @@ class _sendLocationState extends State<sendLocation> {
          Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          Text("Trips will be fetched agian in " , style: TextStyle(fontSize: 18), ),
+          Text("Fetching agian in " , style: TextStyle(fontSize: 18), ),
           Text("$fetchTripsIn", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
           Text(" seconds",  style: TextStyle(fontSize: 18), ),
           ],
@@ -636,7 +656,7 @@ class _sendLocationState extends State<sendLocation> {
                   ),
             Expanded(
               child: ListView(children: <Widget>[  
-            Center(  
+            Center(
                 child: Text(  
                   'Previous Sent data',  
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),  
@@ -651,7 +671,7 @@ class _sendLocationState extends State<sendLocation> {
                     '',  
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
                 )),    
-              ],  
+              ],
               rows: [  
                 datarow("Bus No", busNo.toString()),
                 datarow("Departure Date", departureTime == null ? "-": formatDate(departureTime!) ),
