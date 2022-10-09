@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:bus_tracking/main.dart';
+import 'package:bus_tracking/models/spinner.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/key.dart';
@@ -187,7 +188,7 @@ class _sendLocationState extends State<sendLocation> {
 
   double lat = 0, long = 0;
   int? lastSentTime, departureTime;
-  bool isTripStarted = false, isTripThere = false;
+  bool isTripStarted = false, isTripThere = false, isFetching = false;
   String? token, phoneNo, jwt, busNo;
   Timer? timer;
   ReceivePort? _receivePort;
@@ -293,8 +294,8 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   
-  int FetchFrequency = 5;
-  int fetchTripsIn = 5;
+  int FetchFrequency = 20;
+  int fetchTripsIn = 2;
   
   void decrementfetchTripsIn(){
     setState(() {
@@ -340,6 +341,9 @@ class _sendLocationState extends State<sendLocation> {
       timer?.cancel();
 
     }
+    setState(() {
+      isFetching = false;
+    });
 
   }
 
@@ -347,6 +351,9 @@ class _sendLocationState extends State<sendLocation> {
     print(fetchTripsIn);
     decrementfetchTripsIn();
     if(fetchTripsIn==0){
+        setState(() {
+          isFetching = true;
+        });
         // after the given freq get the trips.
         getTrips();
         resetTime();
@@ -513,8 +520,9 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   Widget buildFetchTrips(){
-    return Scaffold(
-      appBar: AppBar(title: Text("Send Your Location"),
+    return isFetching? CustomSpinner :Scaffold(
+      appBar: AppBar(
+      title: Text("Send Your Location"),
       actions: [
                 FlatButton.icon(onPressed: (){
                   storage.deleteAll();
@@ -524,6 +532,7 @@ class _sendLocationState extends State<sendLocation> {
                 ), 
                 label: Text('logout',style: TextStyle(color: Colors.white),))
             ],
+      backgroundColor: Colors.blueGrey[800],
       
       ),
       body: Column(
@@ -532,16 +541,40 @@ class _sendLocationState extends State<sendLocation> {
         children: [
          Center(
            child: Text(
-            "You don't have any Trips yet"
+            "You don't have any Trips yet",
+             style: TextStyle(fontSize: 18), 
           ),
          ),
-        Text("Trips will be fetched agian in $fetchTripsIn seconds"),
+         SizedBox(height: 40,),
+         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+          Text("Trips will be fetched agian in " , style: TextStyle(fontSize: 18), ),
+          Text("$fetchTripsIn", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+          Text(" seconds",  style: TextStyle(fontSize: 18), ),
+          ],
+         ),
+         SizedBox(height: 40,),
         ElevatedButton(onPressed: (){
           setState(() {
             fetchTripsIn = FetchFrequency;
+            isFetching = true;
           });
           getTrips();
-        }, child: Text("Refresh"))
+        }, 
+        child: Icon(
+          
+          Icons.refresh_rounded,
+          size: 40,
+        ),
+        style: ElevatedButton.styleFrom(
+          primary: Colors.blue[800],
+          shape: CircleBorder(),
+          padding: EdgeInsets.all(20),
+
+        ),
+        ) ,
+        
       ]),
     );
   }
@@ -562,6 +595,7 @@ class _sendLocationState extends State<sendLocation> {
             title: Text('NWKRTC'),
             actions: [
                 FlatButton.icon(onPressed: (){
+                  _stopForegroundTask();
                   storage.deleteAll();
                   Navigator.pushReplacementNamed(context, '/');
                 }, 
@@ -620,31 +654,12 @@ class _sendLocationState extends State<sendLocation> {
               ],  
               rows: [  
                 datarow("Bus No", busNo.toString()),
-                datarow("Departure Date", departureTime == null ? "0": formatDate(departureTime!) ),
-                datarow("Departure Time",departureTime == null ? "0" :formatTime(departureTime!)),
-                datarow( "Last sent time" ,lastSentTime == null? "0" :formatTime(lastSentTime!)),
-
-
+                datarow("Departure Date", departureTime == null ? "-": formatDate(departureTime!) ),
+                datarow("Departure Time",departureTime == null ? "-" :formatTime(departureTime!)),
+                datarow( "Last sent time" ,lastSentTime == null? "-" :formatTime(lastSentTime!)),
               ],  
             ),  
           ])  ,
-              // child: Column(
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     SizedBox(height: 20,),
-              //     SizedBox(height: 20,),
-              //     TableRow( label: "Latitude" ,value: lat.toString()),
-              //     SizedBox(height: 20,),
-              //     TableRow( label: "Latitude" ,value: long.toString()),
-              //     SizedBox(height: 20,),
-              //     TableRow( label: "Last sent time" ,value: lastSentTime == null? "0" :formatTime(lastSentTime!)),
-              //     SizedBox(height: 20,),
-              //     TableRow(label: "Bus No", value: busNo.toString()),
-              //     SizedBox(height: 20,),
-              //     TableRow(label: "Departure Time", value: departureTime == null ? "0" :formatTime(departureTime!)),
-              //   ],
-              // ),
             )
             
             
