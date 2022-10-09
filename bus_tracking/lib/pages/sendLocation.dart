@@ -48,11 +48,15 @@ class FirstTaskHandler extends TaskHandler {
     // try {
 
     //   print(data);
-  
-      var response = await http.post(Uri.parse(url),
-      headers: {"Content-Type": "application/json", "Authorization":"Bearer $token"}, body: body);
-      print("status Code: ${response.statusCode}");
-      data['statusCode'] = response.statusCode;
+      try {
+          var response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", "Authorization":"Bearer $token"}, body: body);
+          print("status Code: ${response.statusCode}");
+          data['statusCode'] = response.statusCode;
+      }
+      catch(e){
+        print(e);
+      }
 
       
 
@@ -101,8 +105,7 @@ class FirstTaskHandler extends TaskHandler {
       startTime = int.parse(value!);
 
     });
-    _streamSubscription = FlLocation.getLocationStream().listen((event) async {
-
+    _streamSubscription = FlLocation.getLocationStream(interval: 2000).listen((event) async {
       // controllerLat.add(event.latitude);
       print("inside the stream");
       int currentTime =  DateTime.now().millisecondsSinceEpoch;
