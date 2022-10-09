@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:isolate';
 
 import 'package:bus_tracking/main.dart';
+import 'package:bus_tracking/models/offline.dart';
 import 'package:bus_tracking/models/spinner.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,7 @@ class FirstTaskHandler extends TaskHandler {
 
   
 
-  Future<Map> sendLocation(Map data) async {
+  Future<Map> sendLocation(Map data , SendPort? sendPort) async {
     int beforeSending =  DateTime.now().millisecondsSinceEpoch;
 
     print(data);
@@ -54,29 +56,16 @@ class FirstTaskHandler extends TaskHandler {
           print("status Code: ${response.statusCode}");
           data['statusCode'] = response.statusCode;
       }
-      catch(e){
+      on SocketException catch (e){
+        sendPort?.send(e.runtimeType);
+        print("Socket exception");
+        data['Exception'] = e.runtimeType.toString();
+        
+      }
+      catch (e){
+        print("general exception");
         print(e);
       }
-
-      
-
-      // if (response.statusCode == 200) {
-      //   print("response is 200");
-
-      //   data['lastSentTime'] = beforeSending;
-      //   data['delay'] =  jsonDecode(response.body)["delay"];
-      //   print("status code is 200");
-      //   return data;
-      // } else {
-        
-      //   print("Exception caught: Failed to get data");
-      //   FlutterForegroundTask.stopService();
-      //   return data;
-      // }
-    // } catch (e) {
-    //   print(e); 
-    // }
-
     return data;
   }
 
@@ -135,7 +124,7 @@ class FirstTaskHandler extends TaskHandler {
         notificationTitle: 'My Location',
         notificationText: '${event.latitude}, ${event.longitude}',
       );
-      data =  await sendLocation(data);
+      data =  await sendLocation(data, sendPort);
 
       // Send data to the main isolate.
       // print(event);
@@ -178,6 +167,26 @@ class FirstTaskHandler extends TaskHandler {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class sendLocation extends StatefulWidget {
   const sendLocation({Key? key}) : super(key: key);
 
@@ -191,11 +200,10 @@ class _sendLocationState extends State<sendLocation> {
 
   double lat = 0, long = 0;
   int? lastSentTime, departureTime;
-  bool isTripStarted = false, isTripThere = false, isFetching = false;
+  bool isTripStarted = false, isTripThere = false, isFetching = false, isOffline = false;
   String? token, phoneNo, jwt, busNo;
   Timer? timer;
   ReceivePort? _receivePort;
-
 
 
    Future<bool> _checkAndRequestPermission({bool? background}) async {
@@ -378,6 +386,7 @@ class _sendLocationState extends State<sendLocation> {
 
           if(message['statusCode'] == 200){
             setState(() {
+              isOffline = false;
               lastSentTime = DateTime.now().millisecondsSinceEpoch;
             });
           }
@@ -394,9 +403,10 @@ class _sendLocationState extends State<sendLocation> {
             storage.delete(key: "departureTime");
           }
         }
-        if (message is DateTime) {
+        else if (message is DateTime) {
           print('timestamp: ${message.toString()}');
-        } else if (message is String) {
+        } 
+        else if (message is String) {
           if (message == 'onNotificationPressed') {
             Navigator.of(context).pushNamed('/resume-route');
           }
@@ -405,10 +415,19 @@ class _sendLocationState extends State<sendLocation> {
             setState(() {
               isTripThere = false;
               isTripStarted = false;
+              
             });
             startgetTripsTimer();
           }
         }
+        else if(message is Type){
+          if(message.toString() == '_ClientSocketException'){
+            setState(() {
+              isOffline = true;
+            });
+          }
+        }
+
       });
 
       return true;
@@ -631,6 +650,7 @@ class _sendLocationState extends State<sendLocation> {
           body: Column(
       
             children: <Widget>[
+              Offline(isOffline: isOffline),
               Expanded(
                 child: Center(
                   child: ElevatedButton(onPressed:(){
