@@ -67,6 +67,7 @@ class LoginWidget extends StatefulWidget {
 class _LoginWidgetState extends State<LoginWidget> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _passwordVisible = false;
 
   late String token;
   String errorMsg = "Invalid Credentials";
@@ -124,11 +125,19 @@ class _LoginWidgetState extends State<LoginWidget> {
                     )),
                 Container(
                   padding: const EdgeInsets.all(15.0),
+
                   child: TextField(
                     keyboardType: TextInputType.number,
+                    cursorColor: Colors.black,
                     controller: nameController,
                     decoration: const InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        borderSide: BorderSide(width: 1,color: Colors.black),
+                      ),
+                      
                       border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: Colors.black),
                       labelText: 'Mobile No',
                     ),
                   ),
@@ -136,11 +145,31 @@ class _LoginWidgetState extends State<LoginWidget> {
                 Container(
                   padding: const EdgeInsets.all(15.0),
                   child: TextField(
-                    obscureText: true,
+                    cursorColor: Colors.black,
+                    obscureText: !_passwordVisible,
                     controller: passwordController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        borderSide: BorderSide(width: 1,color: Colors.black),
+                      ),
+                      
                       border: OutlineInputBorder(),
                       labelText: 'Password',
+                      labelStyle: TextStyle(color: Colors.black),
+                      suffixIcon: IconButton(
+                        onPressed: (){
+                          setState(() {
+                            _passwordVisible = !_passwordVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _passwordVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                          color: Colors.black,
+                        )
+                      )
                     ),
                   ),
                 ),
@@ -172,19 +201,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                               
                               elevation: 1.0,
                               title:  Center(child: Text(errorMsg)),
-                              // content:  Row(
-                              //   mainAxisAlignment: MainAxisAlignment.center,
-                              //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   children : <Widget>[
-                              //     Expanded(
-                              //       child: Text(
-                              //         'Invalid Credentials',
-                              //         textAlign: TextAlign.center,
-                                      
-                              //       ),
-                              //     )
-                              //   ],
-                              // ),                      
+                                                  
                               actionsAlignment: MainAxisAlignment.center,
                               actions: <Widget>[
                                 TextButton(
