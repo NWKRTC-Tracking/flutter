@@ -83,8 +83,9 @@ class _displayMapState extends State<displayMap> {
           appBar: AppBar(
             elevation: 5,
            toolbarHeight: 80,
-            backgroundColor: Colors.blueGrey[800],
-            title: Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'),
+            backgroundColor: widget.delay < 300 ? Colors.blueGrey[800] : Colors.red[400],
+            title: widget.delay < 300 ? Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'):
+                                        Text('Bus No : ${widget.busNo} \nBus Status : Offline'),
             centerTitle: true,
           ),
           body: Stack(
