@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bus_tracking/config/url.dart';
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/models/locationKey.dart';
+import 'package:bus_tracking/models/logo.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/services/displayMap.dart';
 import 'package:flutter/foundation.dart';
@@ -177,7 +178,7 @@ class _HomeState extends State<Home> {
           FocusManager.instance.primaryFocus?.unfocus();
         },
         child: Scaffold(
-          resizeToAvoidBottomInset : false,
+          resizeToAvoidBottomInset : true,
           backgroundColor: Colors.grey[200],
           appBar: AppBar(
             backgroundColor: Colors.blueGrey[800],
@@ -203,120 +204,116 @@ class _HomeState extends State<Home> {
               ), label: Text('Login',style: TextStyle(color: Colors.white),),)
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.all(15),
-                  // child: CircleAvatar(
-                  //   radius: 50,
-                  //   backgroundImage:AssetImage('assets/images/logo.svg'),
-                  //   // backgroundColor: Colors.white,
-                  // ),
-                ),
-                Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(10),
-                    child: const Text(
-                      'Track Bus',
-                      style: TextStyle(
-                          color:  Colors.black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 30),
-                    )),
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  child: TextField(
-                   keyboardType: TextInputType.number,
-                    controller: phoneNoController,
-                    cursorColor: Colors.black,
-                    decoration: const InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                          borderSide: BorderSide(width: 1,color: Colors.black),
-                        ),
-                        
-                        border: OutlineInputBorder(),
-                        labelStyle: TextStyle(color: Colors.black),
-                      labelText: 'Conductor Number',
-                      
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  child: TextField(
-                    controller: busNameController,
-                    cursorColor: Colors.black,
-                    decoration: const InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                          borderSide: BorderSide(width: 1,color: Colors.black),
-                        ),
-                        
-                        border: OutlineInputBorder(),
-                        labelStyle: TextStyle(color: Colors.black),
-                      labelText: 'Bus No',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Container(
-                    height: 50,
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
-                      child: const Text('Track'),
-                    
-                      onPressed: () async {
-                        var phoneNo = phoneNoController.text.toString();
-                        var busNo = busNameController.text.toString();
-                        print(phoneNo+" "+busNo);
-                        // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
-                        var apiKey = await isValidData(phoneNo, busNo);
-                        if(apiKey != null && apiKey != "null") {
-                          Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
-                        } else {
-                          // AlertDialog(
-                          //   content: Text('Error occured'),
-                          // );
-                          showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            // backgroundColor: Colors.redAccent[300],
-                            
-                            elevation: 1.0,
-                            title:  Center(child: Text(errorMsg)),
-                            // content:  Row(
-                            //   mainAxisAlignment: MainAxisAlignment.center,
-                            //   crossAxisAlignment: CrossAxisAlignment.center,
-                            //   children : <Widget>[
-                            //     Expanded(
-                            //       child: Text(
-                            //         'Invalid Data',
-                            //         textAlign: TextAlign.center,
-                                    
-                            //       ),
-                            //     )
-                            //   ],
-                            // ),                      
-                            actionsAlignment: MainAxisAlignment.center,
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, 'OK'),
-                                child: const Text('OK',style: TextStyle(color: Color.fromARGB(255, 39, 91, 42)),),
-                              ),
-                            ],
+          body: SingleChildScrollView(
+            reverse: true,
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: <Widget>[
+                  //Logo
+                  mainLogo,
+                  Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(15),
+                      child: const Text(
+                        'Track Your Bus',
+                        style: TextStyle(
+                            color:  Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 30),
+                      )),
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    child: TextField(
+                     keyboardType: TextInputType.number,
+                      controller: phoneNoController,
+                      cursorColor: Colors.black,
+                      decoration: const InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(4)),
+                            borderSide: BorderSide(width: 1,color: Colors.black),
                           ),
-                          );
+                          
+                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: Colors.black),
+                        labelText: 'Conductor Number',
+                        
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    child: TextField(
+                      controller: busNameController,
+                      cursorColor: Colors.black,
+                      decoration: const InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(4)),
+                            borderSide: BorderSide(width: 1,color: Colors.black),
+                          ),
+                          
+                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: Colors.black),
+                        labelText: 'Bus No',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  Container(
+                      height: 50,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
+                        child: const Text('Track'),
                       
-                        }
-                      },
-                    )
-                )
-              ]
+                        onPressed: () async {
+                          var phoneNo = phoneNoController.text.toString();
+                          var busNo = busNameController.text.toString();
+                          print(phoneNo+" "+busNo);
+                          // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
+                          var apiKey = await isValidData(phoneNo, busNo);
+                          if(apiKey != null && apiKey != "null") {
+                            Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
+                          } else {
+                            // AlertDialog(
+                            //   content: Text('Error occured'),
+                            // );
+                            showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              // backgroundColor: Colors.redAccent[300],
+                              
+                              elevation: 1.0,
+                              title:  Center(child: Text(errorMsg)),
+                              // content:  Row(
+                              //   mainAxisAlignment: MainAxisAlignment.center,
+                              //   crossAxisAlignment: CrossAxisAlignment.center,
+                              //   children : <Widget>[
+                              //     Expanded(
+                              //       child: Text(
+                              //         'Invalid Data',
+                              //         textAlign: TextAlign.center,
+                                      
+                              //       ),
+                              //     )
+                              //   ],
+                              // ),                      
+                              actionsAlignment: MainAxisAlignment.center,
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, 'OK'),
+                                  child: const Text('OK',style: TextStyle(color: Color.fromARGB(255, 39, 91, 42)),),
+                                ),
+                              ],
+                            ),
+                            );
+                        
+                          }
+                        },
+                      )
+                  )
+                ]
+              ),
             ),
           )
         ),
