@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:bus_tracking/main.dart';
+import 'package:bus_tracking/models/spinner.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/key.dart';
@@ -187,7 +188,7 @@ class _sendLocationState extends State<sendLocation> {
 
   double lat = 0, long = 0;
   int? lastSentTime, departureTime;
-  bool isTripStarted = false, isTripThere = false;
+  bool isTripStarted = false, isTripThere = false, isFetching = false;
   String? token, phoneNo, jwt, busNo;
   Timer? timer;
   ReceivePort? _receivePort;
@@ -293,8 +294,8 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   
-  int FetchFrequency = 5;
-  int fetchTripsIn = 5;
+  int FetchFrequency = 20;
+  int fetchTripsIn = 2;
   
   void decrementfetchTripsIn(){
     setState(() {
@@ -334,10 +335,15 @@ class _sendLocationState extends State<sendLocation> {
         departureTime = DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch;
         print(tripDetails['bus_no']);
         busNo = tripDetails['bus_no'];
+        storage.write(key: "busNo", value: busNo);
+        storage.write(key: "departureTime", value: departureTime.toString());
       });
       timer?.cancel();
 
     }
+    setState(() {
+      isFetching = false;
+    });
 
   }
 
@@ -345,6 +351,9 @@ class _sendLocationState extends State<sendLocation> {
     print(fetchTripsIn);
     decrementfetchTripsIn();
     if(fetchTripsIn==0){
+        setState(() {
+          isFetching = true;
+        });
         // after the given freq get the trips.
         getTrips();
         resetTime();
@@ -438,6 +447,20 @@ class _sendLocationState extends State<sendLocation> {
         });
       }
     });
+    storage.read(key: "busNo").then((value) {
+      if(value != null){
+        setState(() {
+          busNo = value;
+        });
+      }
+    },);
+    storage.read(key: "departureTime").then((value){
+      if(value!=null){
+        setState(() {
+        departureTime = int.parse(value);
+      });
+      }
+    });
 
     _initForegroundTask();
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
@@ -497,30 +520,70 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   Widget buildFetchTrips(){
-    return Scaffold(
-      appBar: AppBar(title: Text("Send Your Location")),
+    return isFetching? CustomSpinner :Scaffold(
+      appBar: AppBar(
+      title: Text("Send Your Location"),
+      actions: [
+                FlatButton.icon(onPressed: (){
+                  storage.deleteAll();
+                  Navigator.pushReplacementNamed(context, '/');
+                }, 
+                icon: Icon(Icons.logout,color: Colors.white,
+                ), 
+                label: Text('logout',style: TextStyle(color: Colors.white),))
+            ],
+      backgroundColor: Colors.blueGrey[800],
+      
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
          Center(
            child: Text(
-            "You don't have any Trips yet"
-                 ),
+            "You don't have any Trips yet",
+             style: TextStyle(fontSize: 18), 
+          ),
          ),
-        Text("Trips will be fetched agian in $fetchTripsIn seconds"),
+         SizedBox(height: 40,),
+         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+          Text("Trips will be fetched agian in " , style: TextStyle(fontSize: 18), ),
+          Text("$fetchTripsIn", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+          Text(" seconds",  style: TextStyle(fontSize: 18), ),
+          ],
+         ),
+         SizedBox(height: 40,),
         ElevatedButton(onPressed: (){
           setState(() {
             fetchTripsIn = FetchFrequency;
+            isFetching = true;
           });
           getTrips();
-        }, child: Text("Refresh"))
+        }, 
+        child: Icon(
+          
+          Icons.refresh_rounded,
+          size: 40,
+        ),
+        style: ElevatedButton.styleFrom(
+          primary: Colors.blue[800],
+          shape: CircleBorder(),
+          padding: EdgeInsets.all(20),
+
+        ),
+        ) ,
+        
       ]),
     );
   }
 
-  String  formatTime(int lastSentTime){
-      return DateFormat.Hms().format(DateTime.fromMillisecondsSinceEpoch(lastSentTime));  
+  String  formatTime(int dateTime){
+      return DateFormat("hh:mm:ss a").format(DateTime.fromMillisecondsSinceEpoch(dateTime));  
+  }
+  String formatDate(int dateTime){
+    return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(dateTime));
   }
 
   Widget buildSendLocation(){
@@ -528,9 +591,11 @@ class _sendLocationState extends State<sendLocation> {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.blueGrey[800],
             title: Text('NWKRTC'),
             actions: [
                 FlatButton.icon(onPressed: (){
+                  _stopForegroundTask();
                   storage.deleteAll();
                   Navigator.pushReplacementNamed(context, '/');
                 }, 
@@ -555,9 +620,13 @@ class _sendLocationState extends State<sendLocation> {
                    child:  Text(isTripStarted ? "STOP":"START", style: TextStyle(
                     fontSize: 40,
                   ),),
+
                   style: ElevatedButton.styleFrom(
-                  
-                    primary: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
+                    side: BorderSide(width: 10, color: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74)),
+                    // primary: Color.fromRGBO(0, 0, 0, 0.01),
+                    primary: Color.fromRGBO(255, 255, 255, 0.5),
+                    // shadowColor: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
+                    onPrimary: Colors.black,
                     shape: CircleBorder(),
                     padding: EdgeInsets.all(80),
                   ),
@@ -566,23 +635,31 @@ class _sendLocationState extends State<sendLocation> {
                     ),),
                   ),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: 20,),
-                  SizedBox(height: 20,),
-                  TableRow( label: "Latitude" ,value: lat.toString()),
-                  SizedBox(height: 20,),
-                  TableRow( label: "Latitude" ,value: long.toString()),
-                  SizedBox(height: 20,),
-                  TableRow( label: "Last sent time" ,value: lastSentTime == null? "0" :formatTime(lastSentTime!)),
-                  SizedBox(height: 20,),
-                  TableRow(label: "Bus No", value: busNo.toString()),
-                  SizedBox(height: 20,),
-                  TableRow(label: "Departure Time", value: departureTime == null ? "0" :formatTime(departureTime!)),
-                ],
-              ),
+              child: ListView(children: <Widget>[  
+            Center(  
+                child: Text(  
+                  'Previous Sent data',  
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),  
+                )),  
+            DataTable(  
+              columns: [
+                DataColumn(label: Text(  
+                    '',  
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
+                )),  
+                DataColumn(label: Text(  
+                    '',  
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
+                )),    
+              ],  
+              rows: [  
+                datarow("Bus No", busNo.toString()),
+                datarow("Departure Date", departureTime == null ? "-": formatDate(departureTime!) ),
+                datarow("Departure Time",departureTime == null ? "-" :formatTime(departureTime!)),
+                datarow( "Last sent time" ,lastSentTime == null? "-" :formatTime(lastSentTime!)),
+              ],  
+            ),  
+          ])  ,
             )
             
             
@@ -592,26 +669,18 @@ class _sendLocationState extends State<sendLocation> {
      )
     );
   }
-}
 
-class TableRow extends StatelessWidget {
-  const TableRow({
-    Key? key,
-    required this.label,
-    required this.value,
-  }) : super(key: key);
-
-  final String value, label;
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Text("$label"),
-        Text('$value')
-        ],
-    );
+  DataRow datarow(String label,String value) {
+    return DataRow(cells: [  
+                DataCell(Text(
+                  label,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal)  
+                  )),
+                DataCell(Text(
+                  value,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
+                )),   
+              ]);
   }
 }
+
