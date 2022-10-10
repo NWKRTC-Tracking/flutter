@@ -93,14 +93,14 @@ class _HomeState extends State<Home> {
   if (!_initialURILinkHandled) {
     _initialURILinkHandled = true;
     // 2
-    Fluttertoast.showToast(
-        msg: "Invoked _initURIHandler",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white
-    );
+    // Fluttertoast.showToast(
+    //     msg: "Invoked _initURIHandler",
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.BOTTOM,
+    //     timeInSecForIosWeb: 1,
+    //     backgroundColor: Colors.green,
+    //     textColor: Colors.white
+    // );
     try {
       // 3
       final initialURI = await getInitialUri();
@@ -177,6 +177,7 @@ class _HomeState extends State<Home> {
   TextEditingController busNameController = TextEditingController();
 
   bool _isTrackPressed = false;
+  var _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -216,116 +217,137 @@ class _HomeState extends State<Home> {
             reverse: true,
             child: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: <Widget>[
-                  //Logo
-                  mainLogo,
-                  Container(
-                      alignment: Alignment.center,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    //Logo
+                    mainLogo,
+                    Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(15),
+                        child: const Text(
+                          'Track Your Bus',
+                          style: TextStyle(
+                              color:  Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 30),
+                        )),
+                    Container(
                       padding: const EdgeInsets.all(15),
-                      child: const Text(
-                        'Track Your Bus',
-                        style: TextStyle(
-                            color:  Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 30),
-                      )),
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    child: TextField(
-                     keyboardType: TextInputType.number,
-                      controller: phoneNoController,
-                      cursorColor: Colors.black,
-                      decoration: const InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                            borderSide: BorderSide(width: 1,color: Colors.black),
-                          ),
-                          
-                          border: OutlineInputBorder(),
-                          labelStyle: TextStyle(color: Colors.black),
-                        labelText: 'Conductor Number',
+                      child: TextFormField(
+                       keyboardType: TextInputType.number,
+                        controller: phoneNoController,
+                        validator: (value){
+                          if (value!.length != 10) {
+                          return 'Enter a valid mobile number';
+                        }
+                        return null;
+                       },
+                      
                         
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    child: TextField(
-                      controller: busNameController,
-                      cursorColor: Colors.black,
-                      decoration: const InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                            borderSide: BorderSide(width: 1,color: Colors.black),
-                          ),
-                          
-                          border: OutlineInputBorder(),
-                          labelStyle: TextStyle(color: Colors.black),
-                        labelText: 'Bus No',
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20,),
-                  Container(
-                      height: 50,
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
-                        child: const Text('Track'),
-                        
-                        onPressed: () async {
-                          var phoneNo = phoneNoController.text.toString();
-                          var busNo = busNameController.text.toString();
-                          print(phoneNo+" "+busNo);
-
-                          //Spinner
-                          setState(() {
-                            _isTrackPressed = true;
-                          });
-                          // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
-                          var apiKey = await isValidData(phoneNo, busNo);
-                          if(apiKey != null && apiKey != "null") {
-                            Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
-                          } else {
-                            // AlertDialog(
-                            //   content: Text('Error occured'),
-                            // );
-                            showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              // backgroundColor: Colors.redAccent[300],
-                              
-                              elevation: 1.0,
-                              title:  Center(child: Text(errorMsg)),
-                              // content:  Row(
-                              //   mainAxisAlignment: MainAxisAlignment.center,
-                              //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   children : <Widget>[
-                              //     Expanded(
-                              //       child: Text(
-                              //         'Invalid Data',
-                              //         textAlign: TextAlign.center,
-                                      
-                              //       ),
-                              //     )
-                              //   ],
-                              // ),                      
-                              actionsAlignment: MainAxisAlignment.center,
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, 'OK'),
-                                  child: const Text('OK',style: TextStyle(color: Color.fromARGB(255, 39, 91, 42)),),
-                                ),
-                              ],
+                        cursorColor: Colors.black,
+                        decoration: const InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(4)),
+                              borderSide: BorderSide(width: 1,color: Colors.black),
                             ),
-                            );
-                        
-                          }
+                            
+                            border: OutlineInputBorder(),
+                            labelStyle: TextStyle(color: Colors.black),
+                          labelText: 'Conductor Number',
+                          
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      child: TextFormField(
+                        controller: busNameController,
+                        cursorColor: Colors.black,
+                        validator: (value){
+                          if (value!.isEmpty ||
+                                !RegExp("^KA[-][0-9]{1,2}[-][A-Z]{1,2}[-][0-9]{4}\$")
+                                    .hasMatch(value)) {
+                              return 'Enter a valid Bus No';
+                            }
+                            return null;
                         },
-                      )
-                  )
-                ]
+                        decoration: const InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(4)),
+                              borderSide: BorderSide(width: 1,color: Colors.black),
+                            ),
+                            
+                            border: OutlineInputBorder(),
+                            labelStyle: TextStyle(color: Colors.black),
+                          labelText: 'Bus No',
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    Container(
+                        height: 50,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
+                          child: const Text('Track'),
+                          
+                          onPressed: () async {
+                            var phoneNo = phoneNoController.text.toString();
+                            var busNo = busNameController.text.toString();
+                           
+                            if(!_formKey.currentState!.validate()){
+                              return null;
+                            }
+                            //Spinner
+                            setState(() {
+                              _isTrackPressed = true;
+                            });
+                            // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
+                            var apiKey = await isValidData(phoneNo, busNo);
+                            if(apiKey != null && apiKey != "null") {
+                              Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
+                            } else {
+                              // AlertDialog(
+                              //   content: Text('Error occured'),
+                              // );
+                              showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                // backgroundColor: Colors.redAccent[300],
+                                
+                                elevation: 1.0,
+                                title:  Center(child: Text(errorMsg)),
+                                // content:  Row(
+                                //   mainAxisAlignment: MainAxisAlignment.center,
+                                //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //   children : <Widget>[
+                                //     Expanded(
+                                //       child: Text(
+                                //         'Invalid Data',
+                                //         textAlign: TextAlign.center,
+                                        
+                                //       ),
+                                //     )
+                                //   ],
+                                // ),                      
+                                actionsAlignment: MainAxisAlignment.center,
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, 'OK'),
+                                    child: const Text('OK',style: TextStyle(color: Color.fromARGB(255, 39, 91, 42)),),
+                                  ),
+                                ],
+                              ),
+                              );
+                          
+                            }
+                          },
+                        )
+                    )
+                  ]
+                ),
               ),
             ),
           )
