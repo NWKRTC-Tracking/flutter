@@ -340,11 +340,12 @@ class _sendLocationState extends State<sendLocation> {
       Map tripDetails = jsonDecode(response.body);
       print(tripDetails);
       storage.write(key: "tripId", value: tripDetails['trip_id']);
-      storage.write(key: "startTime", value: DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch.toString() );
+      storage.write(key: "startTime", value: (DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch + 19800000).toString() );
 
       setState(() {
         isTripThere = true;
-        departureTime = DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch;
+        //GMT to IST Conversion
+        departureTime = DateTime.parse(tripDetails['departure_time']).millisecondsSinceEpoch + 19800000;
         print(tripDetails['bus_no']);
         busNo = tripDetails['bus_no'];
         storage.write(key: "busNo", value: busNo);
@@ -656,7 +657,7 @@ class _sendLocationState extends State<sendLocation> {
       return DateFormat("hh:mm:ss a").format(DateTime.fromMillisecondsSinceEpoch(dateTime));  
   }
   String formatDate(int dateTime){
-    return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(dateTime));
+    return DateFormat("dd-MM-yyyy").format(DateTime.fromMillisecondsSinceEpoch(dateTime));
   }
 
   Widget buildSendLocation(){

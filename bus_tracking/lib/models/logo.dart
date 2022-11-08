@@ -9,7 +9,7 @@ final mainLogo = Container(
     shape: BoxShape.circle,
     image: DecorationImage(
         fit: BoxFit.fill,
-        image: AssetImage('assets/images/icon.png'),
+        image: AssetImage('assets/images/logo.png'),
     ),
   )
 );
