@@ -115,10 +115,11 @@ class FirstTaskHandler extends TaskHandler {
       // check if 15 hours have happend, if so delete the trip and stop the foreground service.
       if( data['time'] - data['start_time' ] > 54000000){
         sendPort?.send("15 hours over");
-        await FlutterForegroundTask.stopService();
+        
         await storage.delete(key: "tripId");
         await storage.delete(key: "startTime");
-        
+        await storage.delete(key: "lastSentTime");
+        await FlutterForegroundTask.stopService();
       }
       FlutterForegroundTask.updateService(
         notificationTitle: 'My Location',
@@ -352,6 +353,22 @@ class _sendLocationState extends State<sendLocation> {
       timer?.cancel();
 
     }
+    else if(response.statusCode == 404){
+      
+      if(isTripStarted == true){
+        _stopForegroundTask();
+      }
+       
+      setState(() {
+        isTripThere = false;
+        isTripStarted = false;
+      });    
+      
+      storage.delete(key: "tripId");
+      storage.delete(key: "lastSentTime");
+      storage.delete(key: "departureTime");
+
+    }
     setState(() {
       isFetching = false;
     });
@@ -382,6 +399,8 @@ class _sendLocationState extends State<sendLocation> {
         print('message');
         print(message);
 
+
+
         if(message is Map){
 
           if(message['statusCode'] == 200){
@@ -390,7 +409,7 @@ class _sendLocationState extends State<sendLocation> {
               lastSentTime = DateTime.now().millisecondsSinceEpoch;
             });
           }
-          if(message['statusCode']== 400){
+          if(message['statusCode']== 404){
 
             _stopForegroundTask();
             setState(() {
@@ -401,6 +420,7 @@ class _sendLocationState extends State<sendLocation> {
             storage.delete(key: "tripId");
             storage.delete(key: "lastSentTime");
             storage.delete(key: "departureTime");
+            startgetTripsTimer();
           }
         }
         else if (message is DateTime) {
@@ -419,6 +439,16 @@ class _sendLocationState extends State<sendLocation> {
             });
             startgetTripsTimer();
           }
+          if(message == "Trip is deleted"){
+            print("trip is deleted");
+            setState(() {
+              isTripThere = false;
+              isTripStarted = false;
+              
+            });
+            startgetTripsTimer();
+          }
+
         }
         else if(message is Type){
           if(message.toString() == '_ClientSocketException'){
@@ -461,7 +491,7 @@ class _sendLocationState extends State<sendLocation> {
           phoneNo = payload['sub']; 
         });
       });
-      
+      print("started get Trips timer");
       
       getTrips();
       timer = Timer.periodic(Duration(seconds: 1), (Timer t) => getTripsTimer());
@@ -527,12 +557,12 @@ class _sendLocationState extends State<sendLocation> {
 
   void _storeTime()async{
     // print('store time function');
-  if(isTripStarted){
-    var curTime = DateTime.now().millisecondsSinceEpoch;
-    await storage.write(key: 'timeStamp',value: curTime.toString());
-  }
+      if(isTripStarted){
+        var curTime = DateTime.now().millisecondsSinceEpoch;
+        await storage.write(key: 'timeStamp',value: curTime.toString());
+      }
     
-    }
+  }
 
 
 
