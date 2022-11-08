@@ -4,14 +4,7 @@ import 'dart:convert';
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/pages/Login/login.dart';
 import 'package:bus_tracking/pages/sendLocation.dart';
-// import 'package:bus_tracking/pages/sendlocationpage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uni_links/uni_links.dart';
 
 class sendLocationCheck extends StatelessWidget {
 
@@ -61,30 +54,3 @@ class sendLocationCheck extends StatelessWidget {
     );
   }
 }
-
-// class sendLocation extends StatefulWidget {
-//   const sendLocation({Key? key}) : super(key: key);
-
-//   @override
-//   State<sendLocation> createState() => _sendLocationState();
-// }
-// bool _initialURILinkHandled = false;
-
-// class _sendLocationState extends State<sendLocation> {
-
-//   late String token;
-
-
-
-//   @override
-//   Widget build(BuildContext context) {
-
-//     storage.read(key: "token").then((value){
-//       setState(() {
-//         token = value!;
-//       });
-//     });
-
-//     return SendLocationPage();
-//   }
-// }
