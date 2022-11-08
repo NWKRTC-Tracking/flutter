@@ -1,3 +1,3 @@
 String getUrl(){
-  return "http://nwkrtc-tracking.centralindia.cloudapp.azure.com/api/";
+  return "http://nwkrtcgps.live/api/";
 }
