@@ -267,7 +267,7 @@ class _HomeState extends State<Home> {
                         cursorColor: Colors.black,
                         validator: (value){
                           if (value!.isEmpty ||
-                                !RegExp("^KA[-][0-9]{1,2}[-][A-Z]{1,2}[-][0-9]{4}\$")
+                                !RegExp("^[A-Z]{1}[0-9]{4}\$")
                                     .hasMatch(value)) {
                               return 'Enter a valid Bus No';
                             }
