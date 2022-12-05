@@ -266,11 +266,11 @@ class _HomeState extends State<Home> {
                         controller: busNameController,
                         cursorColor: Colors.black,
                         validator: (value){
-                          if (value!.isEmpty ||
-                                !RegExp("^[A-Z]{1}[0-9]{4}\$")
-                                    .hasMatch(value)) {
-                              return 'Enter a valid Bus No';
-                            }
+                          // if (value!.isEmpty ||
+                          //       !RegExp("^[A-Z]{1}[0-9]{4}\$")
+                          //           .hasMatch(value)) {
+                          //     return 'Enter a valid Bus No';
+                          //   }
                             return null;
                         },
                         decoration: const InputDecoration(
