@@ -35,9 +35,15 @@ class _HomeState extends State<Home> {
     DateTime dt1 = DateTime.parse(cur.toString());
     DateTime dt2 = DateTime.parse(prev.toString());
     Duration diff = dt1.difference(dt2);
-    if(diff.inHours.toInt() >= 15){
+
+
+    // ---------------Logout after 12 hours of trip generation ------------------------
+
+
+    if(diff.inHours.toInt() >= 12){
       storage.deleteAll();
     }
+
   }
 
 
@@ -80,7 +86,7 @@ class _HomeState extends State<Home> {
         _currentURI = null;
         if (err is FormatException) {
           _err = err;
-        } else {
+        } else {  
           _err = null;
         }
       });
