@@ -9,8 +9,6 @@ import 'package:http/http.dart' as http;
 import '../config/url.dart';
 
 
-// final String url = "${getUrl()}api/location/arvind69/";
-
 
 // final String url = "http://10.196.9.48:8080/api/location/";
 String url = getUrl() + "location/";
