@@ -64,11 +64,19 @@ class _displayMapState extends State<displayMap> {
                   point: pointe,
                   width: 60,
                   height: 60,
-                  builder: (context) => const Icon(
-                    MyFlutterApp.location_on,
-                    size: 60,
-                    shadows: <Shadow>[Shadow(color: Colors.black, blurRadius: 1.0)],
-                    color: Colors.black,
+                  // builder: (context) => const Icon(
+                  //   MyFlutterApp.location_on,
+                  //   // Icons.bus_alert_outlined,
+                  //   // ImageIcon(AssetImage('assets/bus.png')) ,
+                  //   size: 60,
+                  //   shadows: <Shadow>[Shadow(color: Colors.black, blurRadius: 1.0)],
+                  //   color: Colors.black,
+                  // ),
+                  builder: (context) => const ImageIcon(
+                      AssetImage("assets/images/bus.png"),
+                      color: Colors.black,
+                      size: 60,
+                      
                   ),
                   anchorPos: anchorPos
                   
