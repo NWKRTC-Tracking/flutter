@@ -1,5 +1,3 @@
 String getUrl(){
-  // return "http://nwkrtcgps.live/api/";
-  // return "http://tracknwkrtc.in/api/";
-  return "http://10.196.7.226/api/";
+  return "https://103.120.178.76:7777/api/";
 }
