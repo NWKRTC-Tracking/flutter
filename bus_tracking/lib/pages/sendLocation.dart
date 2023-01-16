@@ -14,6 +14,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:http/http.dart' as http;
 import 'package:bus_tracking/config/url.dart';
 import 'package:intl/intl.dart';
+import 'package:android_intent_plus/android_intent.dart';
 
 
 @pragma('vm:entry-point')
@@ -207,11 +208,17 @@ class _sendLocationState extends State<sendLocation> {
   ReceivePort? _receivePort;
 
 
+
+
    Future<bool> _checkAndRequestPermission({bool? background}) async {
     if (!await FlLocation.isLocationServicesEnabled) {
-      // Location services are disabled.
-      return false;
+        final AndroidIntent intent  = new AndroidIntent(
+        action: 'android.settings.LOCATION_SOURCE_SETTINGS',
+      );
+
+      await intent.launch();
     }
+
 
     var locationPermission = await FlLocation.checkLocationPermission();
     if (locationPermission == LocationPermission.deniedForever) {
@@ -273,6 +280,13 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   Future<bool> _startForegroundTask() async {
+
+    await _checkAndRequestPermission();
+
+    if(!await FlLocation.isLocationServicesEnabled){
+      return false;
+    }
+
 
     if (!await FlutterForegroundTask.canDrawOverlays) {
       final isGranted =
@@ -685,12 +699,26 @@ class _sendLocationState extends State<sendLocation> {
               Expanded(
                 child: Center(
                   child: ElevatedButton(onPressed:(){
-                      isTripStarted ? _stopForegroundTask(): _startForegroundTask();
+                      // isTripStarted ? _stopForegroundTask(): _startForegroundTask();
+
+                      if(isTripStarted){
+                        _stopForegroundTask();
+                        setState(() {
+                          isTripStarted = !isTripStarted;
+                        });
+                      }
+                      else{
+                        _startForegroundTask().then((value){
+                            if(value){
+                              setState(() {
+                                isTripStarted = !isTripStarted;
+                              });
+                            }
+                            
+                        });
+                      }
                 
-                      setState(() {
-                        isTripStarted = !isTripStarted;
-                      });
-                        _storeTime();
+                      _storeTime();
                     },
                    child:  Text(isTripStarted ? "STOP":"START", style: TextStyle(
                     fontSize: 40,
