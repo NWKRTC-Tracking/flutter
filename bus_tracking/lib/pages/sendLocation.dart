@@ -94,7 +94,7 @@ class FirstTaskHandler extends TaskHandler {
       startTime = int.parse(value!);
 
     });
-    _streamSubscription = FlLocation.getLocationStream(interval: 10000).listen((event) async {
+    _streamSubscription = FlLocation.getLocationStream(interval: 15000).listen((event) async {
       // controllerLat.add(event.latitude);
       print("inside the stream");
       int currentTime =  DateTime.now().millisecondsSinceEpoch;
