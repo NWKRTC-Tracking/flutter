@@ -14,8 +14,8 @@ jobs:
       with:
         channel: stable
         version: 3.05
-    - name: Get Dependencies
-      run: cd bus_tracking && flutter pub get
+    - name: Go to Directory
+      run: cd bus_tracking
     - name: Build APK
       run: flutter build apk --release
       
