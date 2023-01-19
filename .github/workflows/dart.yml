@@ -15,7 +15,7 @@ jobs:
         channel: stable
         version: 3.05
     - name: Get Dependencies
-      run: flutter pub get
+      run: cd bus_tracking && flutter pub get
     - name: Build APK
       run: flutter build apk --output-file=tracking.apk --release
       
