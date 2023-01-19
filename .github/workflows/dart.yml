@@ -14,10 +14,8 @@ jobs:
       with:
         channel: stable
         version: 3.05
-    - name: Go to Directory
-      run: cd bus_tracking
     - name: Build APK
-      run: flutter build apk --release
+      run: cd bus_tracking && flutter build apk --release
       
     - name: Copy apk file to remote
       uses: appleboy/scp-action@master
