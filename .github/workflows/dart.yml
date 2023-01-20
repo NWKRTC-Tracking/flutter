@@ -25,4 +25,5 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: 22
         source: "./bus_tracking/build/app/outputs/flutter-apk/app.apk"
-        target: "/home/documentation/data/apk/app.apk"
+        target: "/home/app.apk"
+
