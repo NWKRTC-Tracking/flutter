@@ -247,7 +247,7 @@ class _HomeState extends State<Home> {
                         maxLength: 10,
                         
                         validator: (value){
-                          if (value!.isEmpty || value!.length != 10 ||
+                          if (value!.isEmpty || value.length != 10 ||
                                 !RegExp(r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$')
                                     .hasMatch(value)) {
                               return 'Enter a valid Mobile number';
