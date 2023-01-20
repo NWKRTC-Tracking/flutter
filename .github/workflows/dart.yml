@@ -15,7 +15,7 @@ jobs:
         channel: stable
         version: 3.05
     - name: Build APK
-      run: cd bus_tracking && flutter build apk --no-fail-on-warning --release
+      run: cd bus_tracking && flutter clean && flutter pub get && flutter build apk --no-fail-on-warning --release
       
     - name: Copy apk file to remote
       uses: appleboy/scp-action@master
