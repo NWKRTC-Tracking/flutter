@@ -145,18 +145,25 @@ class _LoginWidgetState extends State<LoginWidget> {
                           keyboardType: TextInputType.number,
                           cursorColor: Colors.black,
                           controller: nameController,
-                          validator: (value) {
-                            if (value!.length != 10) {
-                              return 'Enter a valid mobile number';
+                          maxLength: 10,
+                          validator: (value){
+                          if (value!.isEmpty || value!.length != 10 ||
+                                !RegExp(r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$')
+                                    .hasMatch(value)) {
+                              return 'Enter a valid Mobile number';
                             }
-                            return null;
+                          return null;
+          
                           },
                           decoration: const InputDecoration(
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(4)),
                               borderSide: BorderSide(width: 1,color: Colors.black),
                             ),
-                            
+                            counter: SizedBox(
+                              width: 0,
+                              height: 0,
+                            ),
                             border: OutlineInputBorder(),
                             labelStyle: TextStyle(color: Colors.black),
                             labelText: 'Mobile No',

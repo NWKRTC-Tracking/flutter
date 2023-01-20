@@ -244,11 +244,16 @@ class _HomeState extends State<Home> {
                       child: TextFormField(
                        keyboardType: TextInputType.number,
                         controller: phoneNoController,
+                        maxLength: 10,
+                        
                         validator: (value){
-                          if (value!.length != 10) {
-                          return 'Enter a valid mobile number';
-                        }
-                        return null;
+                          if (value!.isEmpty || value!.length != 10 ||
+                                !RegExp(r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$')
+                                    .hasMatch(value)) {
+                              return 'Enter a valid Mobile number';
+                            }
+                          return null;
+          
                        },
                       
                         
@@ -257,6 +262,10 @@ class _HomeState extends State<Home> {
                           focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(4)),
                               borderSide: BorderSide(width: 1,color: Colors.black),
+                            ),
+                            counter: SizedBox(
+                              width: 0,
+                              height: 0,
                             ),
                             
                             border: OutlineInputBorder(),
