@@ -13,7 +13,7 @@ jobs:
       uses: subosito/flutter-action@v1
       with:
         channel: stable
-        version: 3.05
+        flutter-version: '3.05'
     - name: Build APK
       run: cd bus_tracking && flutter clean && flutter pub get && flutter build apk --release
       
