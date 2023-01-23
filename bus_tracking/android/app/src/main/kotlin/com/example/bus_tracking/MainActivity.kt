@@ -1,4 +1,4 @@
-package com.example.bus_tracking
+package com.tracknwkrtc.bus_tracking
 
 import android.content.BroadcastReceiver
 import android.os.Bundle
