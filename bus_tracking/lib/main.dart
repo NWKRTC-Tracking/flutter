@@ -1,9 +1,8 @@
-
-
 import 'package:bus_tracking/models/locationKey.dart';
 import 'package:bus_tracking/pages/home.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/pages/resumepage.dart';
+import 'package:bus_tracking/pages/getLocationPermission/permission.dart';
 // import 'package:bus_tracking/pages/sendlocationpage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bus_tracking/poc.dart';
@@ -35,6 +34,7 @@ void main() {
       "/login" : ((context) => Login()),
       "/sendlocation": ((context) => sendLocationCheck()),
       '/resume-route': (context) => const ResumeRoutePage(),
+      "/permission": (context) => getPermission(),
     },
     onGenerateRoute: (settings) {
           if (settings.name == Location.routeName) {

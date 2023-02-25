@@ -4,9 +4,13 @@ import 'package:bus_tracking/config/url.dart';
 import 'package:bus_tracking/models/logo.dart';
 import 'package:bus_tracking/models/spinner.dart';
 import 'package:bus_tracking/pages/sendLocationCheck.dart';
+import 'package:bus_tracking/pages/getLocationPermission/permission.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fl_location/fl_location.dart';
+
 
 import '../../main.dart';
  
@@ -16,6 +20,14 @@ class Login extends StatelessWidget {
     var jwt = await storage.read(key: "jwt");
     if(jwt == null) return "";
     return jwt;
+  }
+  Future<bool> get permissionPresent async {
+    var l = FlLocation.checkLocationPermission();
+    if(l!= LocationPermission.always){
+      return false;
+    }
+    return true;
+
   }
 
 
@@ -32,9 +44,17 @@ class Login extends StatelessWidget {
           // appBar: AppBar(title: const Text(_title)),
           // body: LoginWidget(),
           body: FutureBuilder(
-          future: jwtOrEmpty,            
+          future: jwtOrEmpty,
+                       
           builder: (context, snapshot) {
-           
+            print("getting location permission value ");
+            FlLocation.checkLocationPermission().then((value){
+              print(value);
+              if(value != LocationPermission.always){
+                print("should have went somewhere");
+                Navigator.of(context).pushReplacementNamed("/permission");
+              }
+            });
             if(!snapshot.hasData) return LoginWidget();
             if(snapshot.data != "") {
               var str = snapshot.data.toString();
