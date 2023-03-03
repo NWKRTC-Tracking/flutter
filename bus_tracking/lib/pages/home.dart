@@ -281,6 +281,7 @@ class _HomeState extends State<Home> {
                       child: TextFormField(
                         inputFormatters: [
                           UpperCaseTextFormatter(),
+                          LengthLimitingTextInputFormatter(9),
                         ],
                         controller: busNameController,
                         cursorColor: Colors.black,
