@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:bus_tracking/utils/busNoRegex.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -278,6 +279,10 @@ class _HomeState extends State<Home> {
                     Container(
                       padding: const EdgeInsets.all(15),
                       child: TextFormField(
+                        inputFormatters: [
+                          UpperCaseTextFormatter(),
+                          LengthLimitingTextInputFormatter(9),
+                        ],
                         controller: busNameController,
                         cursorColor: Colors.black,
                         validator: (value){
