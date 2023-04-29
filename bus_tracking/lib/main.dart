@@ -18,6 +18,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_links/uni_links.dart';
 
+import 'package:bus_tracking/pages/test.dart';
+
 
 final storage = FlutterSecureStorage();
 
@@ -30,7 +32,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     initialRoute: "/",
     routes: {
-      "/": ((context) => Home()),
+      "/": ((context) => HomePage()),
       "/login" : ((context) => Login()),
       "/sendlocation": ((context) => sendLocationCheck()),
       '/resume-route': (context) => const ResumeRoutePage(),
