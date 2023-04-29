@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -133,7 +134,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(
-              height: bottomHeight/6,
+              height: bottomHeight/8,
             ),
 
             Container(
@@ -368,6 +369,44 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            SizedBox(height: topHeight/8),
+            Container(
+              width: mediaWidth * 0.5,
+              child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            shape: BoxShape.circle,
+                          ),
+                          padding: EdgeInsets.all(8),
+                          child: IconButton(
+                            icon: Icon(Icons.login),
+                            onPressed: () {
+
+                            },
+                          ),
+                        ),
+                        InkWell(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            child: IconButton(
+                              icon: Icon(Icons.link),
+                              onPressed: () {
+                                launch('https://tracknwkrtc.in/');
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+            ),
+            SizedBox(height: topHeight/10)
           ],
         ),
       ),
