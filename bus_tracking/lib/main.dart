@@ -30,7 +30,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     initialRoute: "/",
     routes: {
-      "/": ((context) => Home()),
+      "/": ((context) => Location(apiKey: "dummy", busNo: "dummy")),
       "/login" : ((context) => Login()),
       "/sendlocation": ((context) => sendLocationCheck()),
       '/resume-route': (context) => const ResumeRoutePage(),

@@ -32,7 +32,7 @@ class _LocationState extends State<Location> {
   late StreamController _locationController;
   double lat = 0, long = 0;
   int conductor_delay = 0, server_delay = 0, delay = 0, totalDelay = 0;
-  String message ="";
+  String message =""; // the error message sent by server
   bool _isDisposed = false;
   late String token;
 
@@ -90,7 +90,7 @@ class _LocationState extends State<Location> {
     
     super.initState();
     _locationController = StreamController();
-    Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
+    // Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
   }
 
   @override
@@ -108,48 +108,48 @@ class _LocationState extends State<Location> {
         body: StreamBuilder(
             stream: _locationController.stream,
             builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                print("Exception: ${snapshot.error}");
-              }
-              if (snapshot.hasData && message == "") {
-                // print('lat');
-                // print(lat);
+              // if (snapshot.hasError) {
+              //   print("Exception: ${snapshot.error}");
+              // }
+              // if (snapshot.hasData && message == "") {
+              //   // The map is shown with latitude, longitude, delay, bus No
+              //   // if we get correct data.
                 return Column(
                   children: <Widget>[
                     displayMap(
-                      lat: lat,
-                      long: long,
+                      lat: 14.618316, 
+                      long: 74.837834,
                       busNo: widget.busNo,
-                      delay : totalDelay
+                      delay : 10,
                     ),
                   ],
                 );
-              }
-              else if(message != ""){
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
+              // }
+              // else if(message != ""){
+              //   return Center(
+              //     child: Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       crossAxisAlignment: CrossAxisAlignment.center,
+              //       children: <Widget>[
 
-                      Text(message),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
-                        onPressed: (){
-                        Navigator.pop(context);
-                      }, 
-                      icon:Icon(
-                        Icons.warning
-                      ), 
-                      label: Text('Return to Home'))
-                    ],
-                  ),
-                );
-              }
-              else{
-                // return CustomSpinner;
-                return CustomSpinnerWithTitle;
-              }
+              //         Text(message),
+              //         ElevatedButton.icon(
+              //           style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
+              //           onPressed: (){
+              //           Navigator.pop(context);
+              //         }, 
+              //         icon:Icon(
+              //           Icons.warning
+              //         ), 
+              //         label: Text('Return to Home'))
+              //       ],
+              //     ),
+              //   );
+              // }
+              // else{
+              //   // return CustomSpinner;
+              //   return CustomSpinnerWithTitle;
+              // }
             }),
       ),
     );
