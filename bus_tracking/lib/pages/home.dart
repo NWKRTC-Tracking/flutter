@@ -15,19 +15,16 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:bus_tracking/utils/busNoRegex.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
-
+class HomePage extends StatefulWidget {
   @override
-  State<Home> createState() => _HomeState();
+  State<HomePage> createState() => _HomePageState();
 }
+
 bool _initialURILinkHandled = false;
 
-
-
-
-class _HomeState extends State<Home> {
+class _HomePageState extends State<HomePage> {
 
   void _autoLogOut(String value){
     var curTime = DateTime.now().millisecondsSinceEpoch;
@@ -47,15 +44,15 @@ class _HomeState extends State<Home> {
 
   }
 
-
-
   @override
   void initState() {
     // var curTime = DateTime.now().millisecondsSinceEpoch;
     // storage.write(key: 'timeStamp',value: curTime.toString());
     super.initState();
-  _initURIHandler();
-  _incomingLinkHandler();
+    _focusNode = FocusNode();
+    _focusNode2 = FocusNode();
+    _initURIHandler();
+    _incomingLinkHandler();
   // _storeTime();
     // _locationController = StreamController();
   }
@@ -135,9 +132,15 @@ class _HomeState extends State<Home> {
   }
   }
   String errorMsg = "Invalid Data";
-  Future<String?> isValidData(String phoneNo, String busNo) async {
-    final msg = jsonEncode({"number":phoneNo,"bus_no":busNo});
-      Map<String,String> headers = {'Content-Type':'application/json'};
+  Future<String?> isValidData(String busOrPhoneNumber, bool _isBusNum) async {
+    final msg;
+    if(_isBusNum){
+      msg = jsonEncode({"bus_no":busOrPhoneNumber});
+    }
+    else {
+      msg = jsonEncode({"number":busOrPhoneNumber});
+    }
+    Map<String,String> headers = {'Content-Type':'application/json'};
     var response = await http.post(
       Uri.parse(getUrl() +  'get-key/'),
       headers: headers,
@@ -166,12 +169,6 @@ class _HomeState extends State<Home> {
 
     return null;
   }
-  // @override
-  // void initState() {
-  // super.initState();
-  // // _initURIHandler();
-  // // _incomingLinkHandler();
-  // }
 
   @override
   void dispose()async{
@@ -180,201 +177,537 @@ class _HomeState extends State<Home> {
   super.dispose();
   }
 
-  TextEditingController phoneNoController = TextEditingController();
-  TextEditingController busNameController = TextEditingController();
 
+  bool _isBusNumber = true;
+
+  TextEditingController _textEditingController = TextEditingController();
+  TextEditingController _textEditingController2 = TextEditingController();
+
+  late FocusNode _focusNode;
+  late FocusNode _focusNode2;
+
+  final _formKey = GlobalKey<FormState>();
   bool _isTrackPressed = false;
-  var _formKey = GlobalKey<FormState>();
+
 
   @override
   Widget build(BuildContext context) {
-    return _isTrackPressed ? CustomSpinnerWithTitle : SafeArea(
-      child: GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        child: Scaffold(
-          resizeToAvoidBottomInset : true,
-          backgroundColor: Colors.grey[200],
-          appBar: AppBar(
-            backgroundColor: Colors.blueGrey[800],
-            // backgroundColor: Color.fromARGB(255, 193, 72, 31),
-            title: Text('NWKRTC'),
-            centerTitle: true,
-            actions: [
-              FlatButton.icon(
-                onPressed: (){
-                 print('login button');
-                storage.read(key: 'timeStamp').then((value){
-                  if(value != null){
-                    print('value not null');
-                    _autoLogOut(value);
-                  }
-                });
-                // ignore: use_build_context_synchronously
-                Navigator.pushNamed(context, '/login');
-              }, 
-              icon: Icon(
-                Icons.login,
-                color: Colors.white,
-              ), label: Text('Login',style: TextStyle(color: Colors.white),),)
-            ],
-          ),
-          body: SingleChildScrollView(
-            reverse: true,
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    //Logo
-                    mainLogo,
-                    Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(15),
+    final topHeight = MediaQuery.of(context).size.height * 0.25;
+    final bottomHeight = MediaQuery.of(context).size.height * 0.75;
+    final mediaWidth = MediaQuery.of(context).size.width;
+    return _isTrackPressed ? CustomSpinnerWithTitle : SafeArea(child:  Scaffold(
+    backgroundColor: Colors.grey[300],
+    resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: topHeight,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      ClipPath(
+                        clipper: _TrapeziumClipper1(),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF1565C0),
+                                Color(0xFF37474F),
+                              ],
+                            ),
+                          ),
+                          // child: Center(
+                          //   child: Text(
+                          //     'Bus\nTracking',
+                          //     style: TextStyle(
+                          //       color: Colors.white,
+                          //       fontSize: 25,
+                          //       fontWeight: FontWeight.bold,
+                          //     ),
+                          //   ),
+                          // ),
+                        ),
+                      ),
+                      Positioned(
+                        top: topHeight * 0.15,
+                        left: (mediaWidth*0.35 - topHeight*0.5)/2 > 0 ? (mediaWidth*0.35 - topHeight*0.5)/2 : 10,
+                        child: Container(
+                          width: topHeight * 0.5,
+                          height: topHeight * 0.5,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: SizedBox(
+                              width: topHeight * 0.49,
+                              height: topHeight * 0.49,
+                              child: Image.asset('assets/images/logo.png'),
+                            ),
+                          ),
+                        ),
+                        // child: SizedBox(
+                        //   width: topHeight * 0.5,
+                        //   height: topHeight * 0.5,
+                        //   child: Image.asset('assets/images/logo.jpg'),
+                        // ),
+                      ),
+                    ],
+                  ),
+                  Stack(
+                    children: [
+                      ClipPath(
+                        clipper: _TrapeziumClipper2(),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF1565C0),
+                                Color(0xFF37474F),
+                              ],
+                            ),
+                          ),
+
+                        ),
+                      ),
+                      Positioned(
+                        top: topHeight * 0.35,
+                        right: (mediaWidth*0.35 - topHeight*0.5)/2 > 0 ? (mediaWidth*0.35 - topHeight*0.5)/2 : 10,
+                        child: Container(
+                          width: topHeight * 0.5,
+                          height: topHeight * 0.5,
+                          child: Center(
+                            child: Text("NWKRTC\nBUS\nTRACKING",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight:FontWeight.bold,
+                              color: Colors.white
+                            ),
+                            )
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: bottomHeight/10,
+            ),
+
+            Container(
+              width: mediaWidth * 0.75,
+              decoration: BoxDecoration(
+                color: Colors.grey[100], // Fill color
+                borderRadius: BorderRadius.circular(15), // Border radius
+                // border: Border.all(
+                //   color: Colors.black, // Border color
+                //   width: 1, // Border width
+                // ),
+              ),
+              child: Center(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: topHeight/10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
                         child: const Text(
-                          'Track Your Bus',
-                          style: TextStyle(
-                              color:  Colors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 30),
-                        )),
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      child: TextFormField(
-                       keyboardType: TextInputType.number,
-                        controller: phoneNoController,
-                        maxLength: 10,
-                        
-                        validator: (value){
-                          if (value!.isEmpty || value.length != 10 ||
-                                !RegExp(r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$')
-                                    .hasMatch(value)) {
-                              return 'Enter a valid Mobile number';
-                            }
-                          return null;
-          
-                       },
-                      
-                        
-                        cursorColor: Colors.black,
-                        decoration: const InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(4)),
-                              borderSide: BorderSide(width: 1,color: Colors.black),
-                            ),
-                            counter: SizedBox(
-                              width: 0,
-                              height: 0,
-                            ),
-                            
-                            border: OutlineInputBorder(),
-                            labelStyle: TextStyle(color: Colors.black),
-                          labelText: 'Conductor Number',
-                          
+                              'TRACK YOUR BUS',
+                              style: TextStyle(
+                                  color:  Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 25),
+                            )
                         ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      child: TextFormField(
-                        inputFormatters: [
-                          UpperCaseTextFormatter(),
-                          LengthLimitingTextInputFormatter(9),
-                        ],
-                        controller: busNameController,
-                        cursorColor: Colors.black,
-                        validator: (value){
-                          // if (value!.isEmpty ||
-                          //       !RegExp("^[A-Z]{1}[0-9]{4}\$")
-                          //           .hasMatch(value)) {
-                          //     return 'Enter a valid Bus No';
-                          //   }
-                            return null;
-                        },
-                        decoration: const InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(4)),
-                              borderSide: BorderSide(width: 1,color: Colors.black),
-                            ),
-                            
-                            border: OutlineInputBorder(),
-                            labelStyle: TextStyle(color: Colors.black),
-                          labelText: 'Bus No',
+                        SizedBox(
+                          height: topHeight/8,
                         ),
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                        height: 50,
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(primary: Colors.blue[800] ),
-                          child: const Text('Track'),
+                      if(_isBusNumber) ...[
+                          Visibility(
                           
-                          onPressed: () async {
-                            var phoneNo = phoneNoController.text.toString();
-                            var busNo = busNameController.text.toString();
-                           
-                            if(!_formKey.currentState!.validate()){
-                              return null;
-                            }
-                            //Spinner
-                            setState(() {
-                              _isTrackPressed = true;
-                            });
-                            // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
-                            var apiKey = await isValidData(phoneNo, busNo);
-                            if(apiKey != null && apiKey != "null") {
-                              Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busNo));
-                            } else {
-                              // AlertDialog(
-                              //   content: Text('Error occured'),
-                              // );
-                              showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                // backgroundColor: Colors.redAccent[300],
+                            visible: _isBusNumber,
+                            child: Container(
+                              width: mediaWidth * 0.6,
+                              child: TextFormField(
                                 
-                                elevation: 1.0,
-                                title:  Center(child: Text(errorMsg)),
-                                // content:  Row(
-                                //   mainAxisAlignment: MainAxisAlignment.center,
-                                //   crossAxisAlignment: CrossAxisAlignment.center,
-                                //   children : <Widget>[
-                                //     Expanded(
-                                //       child: Text(
-                                //         'Invalid Data',
-                                //         textAlign: TextAlign.center,
-                                        
-                                //       ),
-                                //     )
-                                //   ],
-                                // ),                      
-                                actionsAlignment: MainAxisAlignment.center,
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, 'OK'),
-                                    child: const Text('OK',style: TextStyle(color: Color.fromARGB(255, 39, 91, 42)),),
+                                focusNode: _focusNode,
+                                controller: _textEditingController,
+                                cursorColor: Colors.black,
+                                keyboardType: _isBusNumber ? TextInputType.text : null,
+                                decoration: InputDecoration(
+                                  labelText: "Bus Number",
+                                          
+                                  labelStyle: TextStyle(color: Colors.black, fontSize: 15),
+                                  
+                                  fillColor: Colors.grey[200],
+                                  filled: true,
+                                          
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0), // rounded border
                                   ),
-                                ],
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0), // rounded border
+                                    borderSide: BorderSide(color: Color(0xFFEEEEEE)), // border color
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0), // rounded border
+                                    borderSide: BorderSide(color: Colors.black), // border color
+                                  ),
+                                  
+                                ),
+                
+                                validator: (value){
+                                  return null;
+                                },
                               ),
-                              );
+                            ),
+                          ),
+                      ]
+                      else ...[
+                        Visibility(
+                          visible: !_isBusNumber,
+                          child: Container(
+                            width: mediaWidth * 0.6,
+                            child: TextFormField(
+                              maxLength: 10,
+                              focusNode: _focusNode2,
+                              controller: _textEditingController2,
+                              cursorColor: Colors.black,
+                              keyboardType: _isBusNumber ? null : TextInputType.phone,
+                              decoration: InputDecoration(
+                                labelText:  "Mobile Number",
+                              
+                                labelStyle: TextStyle(color: Colors.black, fontSize: 15),
+                                
+                                fillColor: Colors.grey[200],
+                                filled: true,
+                                      
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0), // rounded border
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0), // rounded border
+                                  borderSide: BorderSide(color: Color(0xFFEEEEEE)), // border color
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0), // rounded border
+                                  borderSide: BorderSide(color: Colors.black), // border color
+                                ),
+                                
+                              ),
+                              validator: (value){
+                                if(_isBusNumber) return null;
+                                if (value!.isEmpty || value.length != 10 ||
+                                      !RegExp(r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$')
+                                          .hasMatch(value)) {
+                                    return 'Enter a valid Mobile number';
+                                  }
+                                return null;
+                              
+                              },
+                            ),
+                          ),
+                        ),
+                      ],  
+                      SizedBox(height: topHeight/8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isBusNumber = true;
+                                _textEditingController2.clear();
+                                _focusNode2.unfocus();
+                                _focusNode.requestFocus();
+                              });
+                            },
+                            child: Container(
+                              width: mediaWidth * 0.3,
+                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  bottomLeft: Radius.circular(15),
+                                ),
+                                color: _isBusNumber ? null: Colors.grey.shade300,
+                                gradient: _isBusNumber ? LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF37474F),
+                                    Color(0xFF1565C0),
+                                  ],
+                                ) : null,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'BUS',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isBusNumber = false;
+                                _textEditingController.clear();
+                                _focusNode.unfocus();
+                                _focusNode2.requestFocus();
+                              });
+                            },
+                            child: Container(
+                              width: mediaWidth * 0.3,
+                
+                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15),
+                                ),
+                                color: !_isBusNumber ? null : Colors.grey.shade300,
+                                gradient: !_isBusNumber ? LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF37474F),
+                                  Color(0xFF1565C0),
+                                ],
+                              ) : null,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'MOBILE',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: topHeight/8),
+                      Container(
+                        width: mediaWidth * 0.6,
+                        height: topHeight/5,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          // color: !_isBusNumber ? null : Colors.grey.shade300,
+                          gradient:  LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF37474F),
+                            Color(0xFF1565C0),
+                          ],
+                        ),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            var busOrPhoneNumber;
+                              if(_isBusNumber){
+                                busOrPhoneNumber = _textEditingController.text.toString();
+                              }
+                              else{
+                                busOrPhoneNumber = _textEditingController2.text.toString();
+                              }
+                              // var phoneNo = phoneNoController.text.toString();
+                              // var busNo = busNameController.text.toString();
+                             
+                              if(!_formKey.currentState!.validate()){
+                                return null;
+                              }
+                
+                              print("hi");
+                              //Spinner
+                              setState(() {
+                                _isTrackPressed = true;
+                              });
+                              // Navigator.pushNamed(context, '/location',arguments: locationData(phoneNo,busNo));
+                              var apiKey = await isValidData(busOrPhoneNumber, _isBusNumber);
+                              if(apiKey != null && apiKey != "null") {
+                                Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busOrPhoneNumber));
+                              } else {
+                                // AlertDialog(
+                                //   content: Text('Error occured'),
+                                // );
+                                showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  backgroundColor: Colors.grey[300],
+                                  
+                                  elevation: 2.0,
+                                  title:  Center(child: Text(errorMsg)),
+                                  // content:  Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   crossAxisAlignment: CrossAxisAlignment.center,
+                                  //   children : <Widget>[
+                                  //     Expanded(
+                                  //       child: Text(
+                                  //         'Invalid Data',
+                                  //         textAlign: TextAlign.center,
+                                          
+                                  //       ),
+                                  //     )
+                                  //   ],
+                                  // ),                      
+                                  actionsAlignment: MainAxisAlignment.center,
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, 'OK'),
+                                      child: const Text('OK',style: TextStyle(color: Color(0xFF1565C0)),),
+                                    ),
+                                  ],
+                                ),
+                                );
+                            
+                              }
+                            },
                           
-                            }
-                          },
-                        )
-                    )
-                  ]
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'TRACK ',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward),
+                            ],
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            
+                            primary: Colors.transparent,
+                            onPrimary: Colors.white,
+                            // padding: EdgeInsets.symmetric(
+                            //   vertical: 16,
+                            //   horizontal: 32,
+                            // ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: topHeight/5)
+                    ],
+                  ),
                 ),
               ),
             ),
-          )
+            SizedBox(height: topHeight/8),
+            Container(
+              width: mediaWidth * 0.5,
+              child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            shape: BoxShape.circle,
+                          ),
+                          padding: EdgeInsets.all(8),
+                          child: IconButton(
+                            icon: Icon(Icons.login),
+                            onPressed: (){
+                              print('login button');
+                              storage.read(key: 'timeStamp').then((value){
+                                if(value != null){
+                                  print('value not null');
+                                  _autoLogOut(value);
+                                }
+                              });
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushNamed(context, '/login');
+                            }, 
+                          ),
+                        ),
+                        InkWell(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            child: IconButton(
+                              icon: Icon(Icons.link),
+                              onPressed: () {
+                                launch('https://tracknwkrtc.in/');
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+            ),
+            SizedBox(height: topHeight/10)
+          ],
         ),
       ),
+    )
     );
   }
 }
 
-        
+class _TrapeziumClipper1 extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // path.moveTo(size.width * 0.1, 0);
+    path.moveTo(0, 0);
+    path.lineTo(size.width , 0);
+    path.lineTo(size.width * 0.7, size.height * 0.8);
+    path.lineTo(0, size.height * 0.8);
+    path.close();
+    return path;
+}
+
+@override
+bool shouldReclip(_TrapeziumClipper1 oldClipper) => false;
+}
+
+class _TrapeziumClipper2 extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // path.moveTo(size.width * 0.1, 0);
+    path.moveTo(size.width * 0.3, size.height * 0.2);
+    path.lineTo(size.width, size.height * 0.2);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+    return path;
+}
+
+@override
+bool shouldReclip(_TrapeziumClipper2 oldClipper) => false;
+}
+
+
+
+
+

@@ -1,5 +1,5 @@
 import 'package:bus_tracking/models/locationKey.dart';
-import 'package:bus_tracking/pages/home.dart';
+import 'package:bus_tracking/pages/home_old.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/pages/resumepage.dart';
 import 'package:bus_tracking/pages/getLocationPermission/permission.dart';
@@ -18,7 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_links/uni_links.dart';
 
-import 'package:bus_tracking/pages/test.dart';
+import 'package:bus_tracking/pages/home.dart';
 
 
 final storage = FlutterSecureStorage();
