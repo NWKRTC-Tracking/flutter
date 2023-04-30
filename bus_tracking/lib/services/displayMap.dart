@@ -221,12 +221,13 @@ class _displayMapState extends State<displayMap> {
   }
 }
 
+DraggableScrollableController _DSController = DraggableScrollableController();
 
 /// Return the bottom widget with detals of bus and its position.
-Widget bottomDetailsSheet(String busNo, int delay, Widget busLocationButton, Widget NorthButton) {
+Widget bottomDetailsSheet(String? busNo, int? delay, Widget busLocationButton, Widget NorthButton) {
 
   TextStyle blackBoldTextStyle = TextStyle(
-    color: Colors.black,
+    color: Colors.white,
     fontWeight: FontWeight.bold,
     fontSize: 18,
   );
@@ -244,7 +245,6 @@ Widget bottomDetailsSheet(String busNo, int delay, Widget busLocationButton, Wid
     );
   }
 
-  DraggableScrollableController _DSController = DraggableScrollableController();
 
   return DraggableScrollableSheet(
     initialChildSize: .1,
@@ -279,8 +279,8 @@ Widget bottomDetailsSheet(String busNo, int delay, Widget busLocationButton, Wid
               ],
             ),
             
-            customListTile("Delay", delay.toString()),
-            customListTile("Bus Number", busNo),
+            customListTile("Last Updated", "${delay}s ago"),
+            customListTile("Bus Number", busNo.toString()),
           ],
         ),
       );
