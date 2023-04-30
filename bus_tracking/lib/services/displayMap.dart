@@ -88,12 +88,19 @@ class _displayMapState extends State<displayMap> {
       child: SafeArea(
         child: Scaffold(
           //TODO
+          // appBar: AppBar(
+          //   elevation: 5,
+          //  toolbarHeight: 80,
+          //   backgroundColor: widget.delay < 300 ? Colors.blueGrey[800] : Colors.red[400],
+          //   title: widget.delay < 300 ? Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'):
+          //                               Text('Bus No : ${widget.busNo} \nBus Status : Offline'),
+          //   centerTitle: true,
+          // ),
           appBar: AppBar(
             elevation: 5,
-           toolbarHeight: 80,
+          //  toolbarHeight: 30,
             backgroundColor: widget.delay < 300 ? Colors.blueGrey[800] : Colors.red[400],
-            title: widget.delay < 300 ? Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'):
-                                        Text('Bus No : ${widget.busNo} \nBus Status : Offline'),
+            title: Text("NWKRTC"),
             centerTitle: true,
           ),
           body: Stack(
@@ -146,39 +153,43 @@ class _displayMapState extends State<displayMap> {
                 ),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
-              child: Align(
-                  alignment: Alignment.bottomRight,
-                  // add your floating action button
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.blue[800],
-                    onPressed: () {
-                      // print('Location recenter');
-                      // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
-                      _mapController.moveAndRotate(LatLng(widget.lat,widget.long), _zoom, 0.0);
-                    },
-                    child: Icon(MyFlutterApp.my_location)
-                  ),
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
+                  child: Align(
+                      alignment: Alignment.topRight,
+                      // Location Recenter
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.blue[800],
+                        onPressed: () {
+                          _mapController.moveAndRotate(LatLng(widget.lat,widget.long), _zoom, 0.0);
+                        },
+                        child: Icon(MyFlutterApp.my_location)
+                      ),
+                    ),
                 ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
-              child: Align(
-                  alignment: Alignment.topRight,
-                  // add your floating action button
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.blue[800],
-                    onPressed: () {
-                      // print('Location recenter');
-                      // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
-                      // _mapController.moveAndRotate(center, zoom, degree)
-                      _mapController.rotate(0);
-                    },
-                    child: Icon(Icons.north_rounded)
-                  ),
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
+                  child: Align(
+                      alignment: Alignment.topRight,
+                      // add your floating action button
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.blue[800],
+                        onPressed: () {
+                          // print('Location recenter');
+                          // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
+                          // _mapController.moveAndRotate(center, zoom, degree)
+                          _mapController.rotate(0);
+                        },
+                        child: Icon(Icons.north_rounded)
+                      ),
+                    ),
                 ),
+              ],
             ),
+            
            
             ],
           ),
