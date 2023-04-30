@@ -195,7 +195,7 @@ class _HomePageState extends State<HomePage> {
     final topHeight = MediaQuery.of(context).size.height * 0.25;
     final bottomHeight = MediaQuery.of(context).size.height * 0.75;
     final mediaWidth = MediaQuery.of(context).size.width;
-    return _isTrackPressed ? CustomSpinnerWithTitle : SafeArea(child:  Scaffold(
+    return SafeArea(child:  Scaffold(
     backgroundColor: Colors.grey[300],
     resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
@@ -302,10 +302,22 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+            
+
+            if(_isTrackPressed) ...[
+              Padding(
+                padding: EdgeInsets.only(
+                  top: (bottomHeight - 60)/2 > 0 ? (bottomHeight - 60)/2 : 40
+                ),
+                child: CustomNewSpinner,
+              )
+            ]
+
+            else ...[
+
             SizedBox(
               height: bottomHeight/10,
             ),
-
             Container(
               width: mediaWidth * 0.75,
               decoration: BoxDecoration(
@@ -556,23 +568,16 @@ class _HomePageState extends State<HomePage> {
                                 showDialog<String>(
                                 context: context,
                                 builder: (BuildContext context) => AlertDialog(
+
+                                  shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                
                                   backgroundColor: Colors.grey[300],
                                   
                                   elevation: 2.0,
                                   title:  Center(child: Text(errorMsg)),
-                                  // content:  Row(
-                                  //   mainAxisAlignment: MainAxisAlignment.center,
-                                  //   crossAxisAlignment: CrossAxisAlignment.center,
-                                  //   children : <Widget>[
-                                  //     Expanded(
-                                  //       child: Text(
-                                  //         'Invalid Data',
-                                  //         textAlign: TextAlign.center,
-                                          
-                                  //       ),
-                                  //     )
-                                  //   ],
-                                  // ),                      
+                                                       
                                   actionsAlignment: MainAxisAlignment.center,
                                   actions: <Widget>[
                                     TextButton(
@@ -663,6 +668,7 @@ class _HomePageState extends State<HomePage> {
                     )
             ),
             SizedBox(height: topHeight/10)
+            ]
           ],
         ),
       ),

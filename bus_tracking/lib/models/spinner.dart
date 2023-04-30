@@ -23,3 +23,14 @@ final CustomSpinnerWithTitle = SafeArea(
       body: CustomSpinner,
   ),
 );
+
+final CustomNewSpinner = SpinKitFadingFour(
+  size: 60,
+  itemBuilder: (BuildContext context, int index) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: index.isEven ? Colors.blueGrey[800] : Colors.blue[800],
+      ),
+    );
+  },
+);
