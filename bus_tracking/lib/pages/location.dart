@@ -90,7 +90,7 @@ class _LocationState extends State<Location> {
     
     super.initState();
     _locationController = StreamController();
-    // Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
+    Timer.periodic(Duration(seconds: 1), (_) => loadLocation());
   }
 
   @override
@@ -108,21 +108,21 @@ class _LocationState extends State<Location> {
         body: StreamBuilder(
             stream: _locationController.stream,
             builder: (context, snapshot) {
-              // if (snapshot.hasError) {
-              //   print("Exception: ${snapshot.error}");
-              // }
-              // if (snapshot.hasData && message == "") {
-              //   // The map is shown with latitude, longitude, delay, bus No
-              //   // if we get correct data.
+              if (snapshot.hasError) {
+                print("Exception: ${snapshot.error}");
+              }
+              if (snapshot.hasData && message == "") {
+                // The map is shown with latitude, longitude, delay, bus No
+                // if we get correct data.
                 return Stack(
                   children: [
                     Column(
                       children: <Widget>[
                         displayMap(
-                          lat: 14.618316, 
-                          long: 74.837834,
+                          lat: lat, 
+                          long: long,
                           busNo: widget.busNo,
-                          delay : 10, // totalDelay,
+                          delay : totalDelay, // totalDelay,
                         ),
                       ],
 
@@ -130,32 +130,32 @@ class _LocationState extends State<Location> {
 
                   ],
                 );
-              // }
-              // else if(message != ""){
-              //   return Center(
-              //     child: Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       crossAxisAlignment: CrossAxisAlignment.center,
-              //       children: <Widget>[
+              }
+              else if(message != ""){
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
 
-              //         Text(message),
-              //         ElevatedButton.icon(
-              //           style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
-              //           onPressed: (){
-              //           Navigator.pop(context);
-              //         }, 
-              //         icon:Icon(
-              //           Icons.warning
-              //         ), 
-              //         label: Text('Return to Home'))
-              //       ],
-              //     ),
-              //   );
-              // }
-              // else{
-              //   // return CustomSpinner;
-              //   return CustomSpinnerWithTitle;
-              // }
+                      Text(message),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(primary: Colors.blueGrey[800]),
+                        onPressed: (){
+                        Navigator.pop(context);
+                      }, 
+                      icon:Icon(
+                        Icons.warning
+                      ), 
+                      label: Text('Return to Home'))
+                    ],
+                  ),
+                );
+              }
+              else{
+                // return CustomSpinner;
+                return CustomSpinnerWithTitle;
+              }
             }),
       ),
     );
