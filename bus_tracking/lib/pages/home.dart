@@ -634,10 +634,8 @@ class _HomePageState extends State<HomePage> {
                           child: IconButton(
                             icon: Icon(Icons.login),
                             onPressed: (){
-                              print('login button');
                               storage.read(key: 'timeStamp').then((value){
                                 if(value != null){
-                                  print('value not null');
                                   _autoLogOut(value);
                                 }
                               });
