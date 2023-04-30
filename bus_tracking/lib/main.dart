@@ -30,7 +30,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     initialRoute: "/",
     routes: {
-      "/": ((context) => Location(apiKey: "dummy", busNo: "dummy")),
+      "/": ((context) => Home()),
       "/login" : ((context) => Login()),
       "/sendlocation": ((context) => sendLocationCheck()),
       '/resume-route': (context) => const ResumeRoutePage(),
@@ -49,7 +49,7 @@ void main() {
             return MaterialPageRoute(
               builder: (context) {
                 return Location(
-                  apiKey: args!.key,
+                  apiKey: args.key,
                   busNo: args.busNo,
                 );
               },
