@@ -551,7 +551,7 @@ class _sendLocationState extends State<sendLocation> {
     });
 
     _initForegroundTask();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // You can get the previous ReceivePort without restarting the service.
       if (await FlutterForegroundTask.isRunningService) {
         setState(() {
