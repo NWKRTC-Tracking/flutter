@@ -617,7 +617,7 @@ class _HomePageState extends State<HomePage> {
                               //   horizontal: 32,
                               // ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(15),
                               ),
                             ),
                           ),
