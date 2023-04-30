@@ -128,7 +128,6 @@ class _LocationState extends State<Location> {
 
                     ),
 
-                    bottomDetailsSheet(widget.busNo, totalDelay),
                   ],
                 );
               // }
@@ -161,66 +160,4 @@ class _LocationState extends State<Location> {
       ),
     );
   }
-}
-
-/// Return the bottom widget with detals of bus and its position.
-Widget bottomDetailsSheet(String busNo, int delay) {
-
-  TextStyle whiteBoldTextStyle = TextStyle(
-    color: Colors.white,
-    fontWeight: FontWeight.bold,
-    fontSize: 18,
-  );
-
-  ListTile customListTile(String title, String subtitle) {
-    return ListTile(
-      title: Text(
-        title,
-        style: whiteBoldTextStyle,
-      ),
-      subtitle: Text(
-        subtitle,
-        style: whiteBoldTextStyle,
-      ),
-    );
-  }
-
-  return DraggableScrollableSheet(
-    initialChildSize: .2,
-    minChildSize: .1,
-    maxChildSize: .6,
-    builder: (BuildContext context, ScrollController scrollController) {
-      return Container(
-        color:  Colors.blueGrey[800],
-        child: ListView(
-          controller: scrollController,
-          children: [
-            draggableLine(),
-            customListTile("Bus Number", busNo),
-            customListTile("Delay", delay.toString()),
-            customListTile("LIFESPAN", "10"),
-            customListTile("WEIGHT", "203"),
-          ],
-        ),
-      );
-    },
-  );
-}
-
-Column draggableLine() {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    
-    children: [
-      Container(
-        width: 50,
-        height: 4,
-        decoration: BoxDecoration(
-          border: Border.all(),
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20))
-        ),
-      )
-    ],
-  );
 }
