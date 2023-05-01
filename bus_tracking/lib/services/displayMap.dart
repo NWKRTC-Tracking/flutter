@@ -104,7 +104,7 @@ class _displayMapState extends State<displayMap> {
             flexibleSpace: Container(
               decoration: gradientBoxDecoration()
             ),
-            title: Text("NWKRTC"),
+            title: const Text("NWKRTC"),
             centerTitle: true,
           ),
           body: Stack(
@@ -283,7 +283,7 @@ Widget bottomDetailsSheet(String? busNo, int? delay, Widget busLocationButton, W
             customListTile("Bus Number", busNo.toString()),
           ],
         ),
-      );
+      );     
     },
   );
 }
@@ -294,10 +294,6 @@ FloatingActionButton dragUpButton(DraggableScrollableController _DSController, S
                   foregroundColor: Colors.black,
                   onPressed: () {
                     _DSController.jumpTo(0.3);
-                    scrollController.jumpTo(10);
-                    // scrollController.animateTo(10,
-                    //   duration: Duration(milliseconds: 500),
-                    //   curve: Curves.easeInOut);
                   },
                   child: Icon(Icons.keyboard_double_arrow_up)
                 );
