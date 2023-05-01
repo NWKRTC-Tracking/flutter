@@ -611,7 +611,7 @@ class _sendLocationState extends State<sendLocation> {
       appBar: AppBar(
       title: Text("NWKRTC"),
       actions: [
-                FlatButton.icon(onPressed: (){
+                FloatingActionButton.extended(onPressed: (){
                   storage.deleteAll();
                   timer?.cancel();
                   Navigator.pushReplacementNamed(context, '/');
@@ -682,11 +682,13 @@ class _sendLocationState extends State<sendLocation> {
             backgroundColor: Colors.blueGrey[800],
             title: Text('NWKRTC'),
             actions: [
-                FlatButton.icon(onPressed: (){
+              // TODO: style this properly.
+                ElevatedButton.icon(onPressed: (){
                   _stopForegroundTask();
                   storage.deleteAll();
                   Navigator.pushReplacementNamed(context, '/');
                 }, 
+                // backgroundColor: Colors.blueGrey[900],
                 icon: Icon(Icons.logout,color: Colors.white,
                 ), 
                 label: Text('logout',style: TextStyle(color: Colors.white),))
