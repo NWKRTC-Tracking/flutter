@@ -2,15 +2,10 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
     <item android:drawable="@color/background"/>
-    <item android:bottom="50dp">
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/from"/>
-    </item>
-    <!-- <item>
+    <item>
         <bitmap
             android:gravity="center"
             android:src="@mipmap/launcher_icon"/>
-    </item> -->
+    </item>
     
 </layer-list>
