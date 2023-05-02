@@ -257,11 +257,6 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          // child: SizedBox(
-                          //   width: topHeight * 0.5,
-                          //   height: topHeight * 0.5,
-                          //   child: Image.asset('assets/images/logo.jpg'),
-                          // ),
                         ),
                       ],
                     ),
@@ -327,10 +322,6 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   color: Colors.grey[100], // Fill color
                   borderRadius: BorderRadius.circular(15), // Border radius
-                  // border: Border.all(
-                  //   color: Colors.black, // Border color
-                  //   width: 1, // Border width
-                  // ),
                 ),
                 child: Center(
                   child: Form(
@@ -555,8 +546,6 @@ class _HomePageState extends State<HomePage> {
                                 else{
                                   busOrPhoneNumber = _textEditingController2.text.toString();
                                 }
-                                // var phoneNo = phoneNoController.text.toString();
-                                // var busNo = busNameController.text.toString();
                                
                                 if(!_formKey.currentState!.validate()){
                                   return null;
@@ -572,9 +561,7 @@ class _HomePageState extends State<HomePage> {
                                 if(apiKey != null && apiKey != "null") {
                                   Navigator.pushNamed(context, '/location',arguments: locationKey(apiKey, busOrPhoneNumber));
                                 } else {
-                                  // AlertDialog(
-                                  //   content: Text('Error occured'),
-                                  // );
+                                  
                                   showDialog<String>(
                                   context: context,
                                   builder: (BuildContext context) => AlertDialog(
@@ -618,10 +605,7 @@ class _HomePageState extends State<HomePage> {
                               
                               primary: Colors.transparent,
                               onPrimary: Colors.white,
-                              // padding: EdgeInsets.symmetric(
-                              //   vertical: 16,
-                              //   horizontal: 32,
-                              // ),
+                              
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
