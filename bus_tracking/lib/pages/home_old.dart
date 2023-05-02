@@ -202,7 +202,8 @@ class _HomeState extends State<Home> {
             title: Text('NWKRTC'),
             centerTitle: true,
             actions: [
-              FlatButton.icon(
+              
+              FloatingActionButton.extended(
                 onPressed: (){
                  print('login button');
                 storage.read(key: 'timeStamp').then((value){
