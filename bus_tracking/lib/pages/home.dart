@@ -222,8 +222,8 @@ class _HomePageState extends State<HomePage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFF1565C0),
                                   Color(0xFF37474F),
+                                  Color(0xFF1565C0),
                                 ],
                               ),
                             ),
@@ -276,8 +276,8 @@ class _HomePageState extends State<HomePage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFF1565C0),
                                   Color(0xFF37474F),
+                                  Color(0xFF1565C0),
                                 ],
                               ),
                             ),
