@@ -73,27 +73,3 @@ void main() {
   ));
 }
 
-// class PocApp extends StatelessWidget {
-//   // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     DeepLinkBloc _bloc = DeepLinkBloc();
-//     return MaterialApp(
-//         title: 'Flutter and Deep Linsk PoC',
-//         theme: ThemeData(
-//             primarySwatch: Colors.blue,
-//             textTheme: TextTheme(
-//               subtitle1: const TextStyle(
-//                 fontWeight: FontWeight.w300,
-//                 color: Colors.blue,
-//                 fontSize: 25.0,
-//               ),
-//             )),
-//         home: Scaffold(
-//             body: Provider<DeepLinkBloc>(
-//                 create: (context) => _bloc,
-//                 dispose: (context, bloc) => bloc.dispose(),
-//                 child: PocWidget()
-//                 )));
-//   }
-// }
