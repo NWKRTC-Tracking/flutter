@@ -164,16 +164,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 ],
                               ),
                             ),
-                            // child: Center(
-                            //   child: Text(
-                            //     'Bus\nTracking',
-                            //     style: TextStyle(
-                            //       color: Colors.white,
-                            //       fontSize: 25,
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            // ),
                           ),
                         ),
                         Positioned(
@@ -194,11 +184,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                               ),
                             ),
                           ),
-                          // child: SizedBox(
-                          //   width: topHeight * 0.5,
-                          //   height: topHeight * 0.5,
-                          //   child: Image.asset('assets/images/logo.jpg'),
-                          // ),
                         ),
                       ],
                     ),
@@ -264,10 +249,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                 decoration: BoxDecoration(
                   color: Colors.grey[100], // Fill color
                   borderRadius: BorderRadius.circular(15), // Border radius
-                  // border: Border.all(
-                  //   color: Colors.black, // Border color
-                  //   width: 1, // Border width
-                  // ),
                 ),
                 child: Center(
                   child: Form(
@@ -426,10 +407,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                               
                               primary: Colors.transparent,
                               onPrimary: Colors.white,
-                              // padding: EdgeInsets.symmetric(
-                              //   vertical: 16,
-                              //   horizontal: 32,
-                              // ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -490,143 +467,6 @@ class _LoginWidgetState extends State<LoginWidget> {
               ]
             ],
           ),
-            // child: Padding(
-            //     padding: const EdgeInsets.all(15),
-            //     child: Form(
-            //       key: _formKey,
-            //       child: Column(
-            //         children: <Widget>[
-            //           mainLogo,
-            //           Container(
-            //               alignment: Alignment.center,
-            //               padding: const EdgeInsets.all(10),
-            //               child: const Text(
-            //                 'LOGIN',
-            //                 style: TextStyle(
-            //                     color: Colors.black,
-            //                     fontWeight: FontWeight.w500,
-            //                     fontSize: 30),
-            //               )),
-            //           Container(
-            //             padding: const EdgeInsets.all(15.0),
-                  
-            //             child: TextFormField(
-            //               keyboardType: TextInputType.number,
-            //               cursorColor: Colors.black,
-            //               controller: nameController,
-            //               maxLength: 10,
-            //               validator: (value){
-            //               if (value!.isEmpty || value.length != 10 ||
-            //                     !RegExp(r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$')
-            //                         .hasMatch(value)) {
-            //                   return 'Enter a valid Mobile number';
-            //                 }
-            //               return null;
-          
-            //               },
-            //               decoration: const InputDecoration(
-            //                 focusedBorder: OutlineInputBorder(
-            //                   borderRadius: BorderRadius.all(Radius.circular(4)),
-            //                   borderSide: BorderSide(width: 1,color: Colors.black),
-            //                 ),
-            //                 counter: SizedBox(
-            //                   width: 0,
-            //                   height: 0,
-            //                 ),
-            //                 border: OutlineInputBorder(),
-            //                 labelStyle: TextStyle(color: Colors.black),
-            //                 labelText: 'Mobile No',
-            //               ),
-            //             ),
-            //           ),
-            //           Container(
-            //             padding: const EdgeInsets.all(15.0),
-            //             child: TextFormField(
-            //               cursorColor: Colors.black,
-                          // obscureText: !_passwordVisible,
-                          // controller: passwordController,
-                          // validator: (value) {
-                          //   if (value!.length < 1) {
-                          //     return 'Enter Password';
-                          //   }
-                          //   return null;
-                          // },
-            //               decoration: InputDecoration(
-            //                 focusedBorder: OutlineInputBorder(
-            //                   borderRadius: BorderRadius.all(Radius.circular(4)),
-            //                   borderSide: BorderSide(width: 1,color: Colors.black),
-            //                 ),
-                            
-            //                 border: OutlineInputBorder(),
-            //                 labelText: 'Password',
-            //                 labelStyle: TextStyle(color: Colors.black),
-            //                 suffixIcon: IconButton(
-            //                   onPressed: (){
-            //                     setState(() {
-            //                       _passwordVisible = !_passwordVisible;
-            //                     });
-            //                   },
-            //                   icon: Icon(
-            //                     _passwordVisible
-            //                     ? Icons.visibility_off
-            //                     : Icons.visibility,
-            //                     color: Colors.black,
-            //                   )
-            //                 )
-            //               ),
-            //             ),
-            //           ),
-            //           SizedBox(height: 20,),
-            //           Container(
-            //               height: 80,
-            //               padding: const EdgeInsets.all(15.0),
-            //               child: ElevatedButton(
-            //                 style: ElevatedButton.styleFrom(primary: Colors.blue[800]),
-            //                 child: const Text('Login'),
-            //                 onPressed: () async {
-            //                   if(!_formKey.currentState!.validate()){
-            //                   return null;
-            //                   }
-            //                   setState(() {
-            //                     _isLoginPressed = true;
-            //                   });
-            //                   var username = nameController.text.toString();
-            //                   var password = passwordController.text.toString();
-            //                   var jwt = await attemptLogIn(username, password);
-            //                   if(jwt != null) {
-            //                     await storage.write(key: "token", value: token);
-            //                     await storage.write(key: "jwt", value: jwt);
-            //                     Navigator.push(
-            //                       context,
-            //                       MaterialPageRoute(
-            //                         builder: (context) => sendLocationCheck(),
-            //                       )
-            //                     );
-            //                   } else {
-            //                     showDialog<String>(
-            //                       context: context,
-            //                       builder: (BuildContext context) => AlertDialog(
-            //                         // backgroundColor: Colors.redAccent[300],
-                                    
-            //                         elevation: 1.0,
-            //                         title:  Center(child: Text(errorMsg)),
-                                                        
-            //                         actionsAlignment: MainAxisAlignment.center,
-            //                         actions: <Widget>[
-            //                           TextButton(
-            //                             onPressed: () => Navigator.pop(context, 'OK'),
-            //                             child: const Text('OK',style: TextStyle(color:Colors.black),),
-            //                           ),
-            //                         ],
-            //                       ),
-            //                       );
-            //                     }
-            //                 },
-            //               )
-            //           ),
-            //         ],
-            //       ),
-            //     )),
           ),
         ),
       ),
