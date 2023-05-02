@@ -16,40 +16,13 @@ class _getPermissionState extends State<getPermission> {
 
 
   Future<bool> _checkAndRequestPermission({bool? background}) async {
-    // // if (!await FlLocation.isLocationServicesEnabled) {
-    //     final AndroidIntent intent  = new AndroidIntent(
-    //     action: 'android.settings.LOCATION_SOURCE_SETTINGS',
-    //   );
-
-    //   await intent.launch();
-    // // }
 
 
     var locationPermission = await FlLocation.checkLocationPermission();
-    // if (locationPermission == LocationPermission.deniedForever) {
-    //   // Cannot request runtime permission because location permission is denied forever.
-    //   return false;
-    // } else 
 
     if(locationPermission == LocationPermission.always) return true;
 
-
-   
-    // if (locationPermission == LocationPermission.denied || locationPermission == LocationPermission.deniedForever || locationPermission == LocationPermission.whileInUse) {
-      // Ask the user for location permission.
-      locationPermission = await FlLocation.requestLocationPermission();
-
-    //   if (locationPermission == LocationPermission.denied ||
-    //       locationPermission == LocationPermission.deniedForever ||
-    //       locationPermission == LocationPermission.whileInUse ) {
-    //         return false;
-    //         }
-    // // }
-
-    // Location permission must always be allowed (LocationPermission.always)
-    // to collect location data in the background.
-    // if (background == true &&
-    //     locationPermission == LocationPermission.whileInUse) return false;
+    locationPermission = await FlLocation.requestLocationPermission();
 
     // Location services has been enabled and permission have been granted.
     if(locationPermission == LocationPermission.always) return true;
@@ -96,16 +69,7 @@ class _getPermissionState extends State<getPermission> {
                                 ],
                               ),
                             ),
-                            // child: Center(
-                            //   child: Text(
-                            //     'Bus\nTracking',
-                            //     style: TextStyle(
-                            //       color: Colors.white,
-                            //       fontSize: 25,
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            // ),
+                            
                           ),
                         ),
                         Positioned(
@@ -126,11 +90,7 @@ class _getPermissionState extends State<getPermission> {
                               ),
                             ),
                           ),
-                          // child: SizedBox(
-                          //   width: topHeight * 0.5,
-                          //   height: topHeight * 0.5,
-                          //   child: Image.asset('assets/images/logo.jpg'),
-                          // ),
+                          
                         ),
                       ],
                     ),
@@ -185,10 +145,6 @@ class _getPermissionState extends State<getPermission> {
                 decoration: BoxDecoration(
                   color: Colors.grey[100], // Fill color
                   borderRadius: BorderRadius.circular(15), // Border radius
-                  // border: Border.all(
-                  //   color: Colors.black, // Border color
-                  //   width: 1, // Border width
-                  // ),
                 ),
                 child: Center(
                   child: Column(
@@ -257,22 +213,14 @@ class _getPermissionState extends State<getPermission> {
                               
                               primary: Colors.transparent,
                               onPrimary: Colors.white,
-                              // padding: EdgeInsets.symmetric(
-                              //   vertical: 16,
-                              //   horizontal: 32,
-                              // ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
                             ),
                             onPressed: (){
-                              // print("asking something");
                               _checkAndRequestPermission(background: true).then((value){
-                                // print("value is"+value.toString());
                                 if(value== true){
-                                  // print("popping");
                                   Navigator.of(context).pushReplacementNamed("/login");
-
                                   }
                                 });
                               },
@@ -306,55 +254,6 @@ class _getPermissionState extends State<getPermission> {
         ),
       ),
     );
-
-    // return Scaffold(
-    //   body: Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     crossAxisAlignment: CrossAxisAlignment.center,
-    //     children: [
-        
-    //      Padding(
-    //        padding: const EdgeInsets.all(10.0),
-    //        child: Column(
-    //          children: [
-    //            Center(
-    //              child: Text(
-    //               "Bus tracking collects location data to enable sending your location to passengers of your bus even when the app is closed or not in use.",
-    //                style: TextStyle(fontSize: 18), 
-    //             ),
-    //            ),
-    //           SizedBox(height: 20),
-
-    //           Center(
-    //              child: Text(
-    //               "Please press agree and select 'allow all the time' to give permission",
-    //                style: TextStyle(fontSize: 18), 
-    //             ),
-    //            ),
-
-    //          ],
-    //        ),
-    //      ),
-    //      SizedBox(height: 40,),
-         
-    //     ElevatedButton(
-    //       style: ElevatedButton.styleFrom(primary: Colors.blue[800]),
-    //       onPressed: (){
-    //       // print("asking something");
-    //       _checkAndRequestPermission(background: true).then((value){
-    //         // print("value is"+value.toString());
-    //         if(value== true){
-    //           // print("popping");
-    //           Navigator.of(context).pushReplacementNamed("/login");
-
-    //         }
-    //       });
-    //     }, 
-    //     child: Text("Agree")
-    //     ) ,
-        
-    //   ]),
-    // );
   }
 }
 
