@@ -213,8 +213,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFF37474F),
                                   Color(0xFF1565C0),
+                                  Color(0xFF37474F),
                                 ],
                               ),
                             ),
@@ -399,8 +399,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Color(0xFF37474F),
-                              Color(0xFF1565C0),
+                               Color(0xFF28578B),
+                                Color(0xFF28578B),
+                              // Color(0xFF37474F),
+                              // Color(0xFF1565C0),
                             ],
                           ),
                           ),

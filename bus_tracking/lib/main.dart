@@ -1,8 +1,11 @@
 import 'package:bus_tracking/models/locationKey.dart';
+import 'package:bus_tracking/pages/customSplashscreen.dart';
+import 'package:bus_tracking/pages/home_old.dart';
 // import 'package:bus_tracking/pages/home_old.dart';
 import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/pages/resumepage.dart';
 import 'package:bus_tracking/pages/getLocationPermission/permission.dart';
+import 'package:bus_tracking/pages/splashScreen.dart';
 // import 'package:bus_tracking/pages/sendlocationpage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bus_tracking/poc.dart';
