@@ -682,8 +682,7 @@ class _sendLocationState extends State<sendLocation> {
             backgroundColor: Colors.blueGrey[800],
             title: Text('NWKRTC'),
             actions: [
-              // TODO: style this properly.
-                ElevatedButton.icon(onPressed: (){
+                FloatingActionButton.extended(onPressed: (){
                   _stopForegroundTask();
                   storage.deleteAll();
                   Navigator.pushReplacementNamed(context, '/');
