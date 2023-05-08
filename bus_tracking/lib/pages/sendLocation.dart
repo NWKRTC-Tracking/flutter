@@ -551,7 +551,7 @@ class _sendLocationState extends State<sendLocation> {
     });
 
     _initForegroundTask();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // You can get the previous ReceivePort without restarting the service.
       if (await FlutterForegroundTask.isRunningService) {
         setState(() {
@@ -611,7 +611,7 @@ class _sendLocationState extends State<sendLocation> {
       appBar: AppBar(
       title: Text("NWKRTC"),
       actions: [
-                FlatButton.icon(onPressed: (){
+                FloatingActionButton.extended(onPressed: (){
                   storage.deleteAll();
                   timer?.cancel();
                   Navigator.pushReplacementNamed(context, '/');
@@ -682,11 +682,12 @@ class _sendLocationState extends State<sendLocation> {
             backgroundColor: Colors.blueGrey[800],
             title: Text('NWKRTC'),
             actions: [
-                FlatButton.icon(onPressed: (){
+                FloatingActionButton.extended(onPressed: (){
                   _stopForegroundTask();
                   storage.deleteAll();
                   Navigator.pushReplacementNamed(context, '/');
                 }, 
+                // backgroundColor: Colors.blueGrey[900],
                 icon: Icon(Icons.logout,color: Colors.white,
                 ), 
                 label: Text('logout',style: TextStyle(color: Colors.white),))

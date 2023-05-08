@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bus_tracking/pages/location.dart';
 import 'package:bus_tracking/presentation/my_flutter_app_icons.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -88,12 +89,22 @@ class _displayMapState extends State<displayMap> {
       child: SafeArea(
         child: Scaffold(
           //TODO
+          // appBar: AppBar(
+          //   elevation: 5,
+          //  toolbarHeight: 80,
+          //   backgroundColor: widget.delay < 300 ? Colors.blueGrey[800] : Colors.red[400],
+          //   title: widget.delay < 300 ? Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'):
+          //                               Text('Bus No : ${widget.busNo} \nBus Status : Offline'),
+          //   centerTitle: true,
+          // ),
           appBar: AppBar(
             elevation: 5,
-           toolbarHeight: 80,
-            backgroundColor: widget.delay < 300 ? Colors.blueGrey[800] : Colors.red[400],
-            title: widget.delay < 300 ? Text('Bus No : ${widget.busNo} \nLast updated : ${widget.delay}s ago'):
-                                        Text('Bus No : ${widget.busNo} \nBus Status : Offline'),
+          //  toolbarHeight: 30,
+            // backgroundColor: widget.delay < 300 ? Color.fromARGB(255, 225, 245, 255) : Colors.red[400],
+            flexibleSpace: Container(
+              decoration: gradientBoxDecoration()
+            ),
+            title: const Text("NWKRTC"),
             centerTitle: true,
           ),
           body: Stack(
@@ -146,44 +157,181 @@ class _displayMapState extends State<displayMap> {
                 ),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
-              child: Align(
-                  alignment: Alignment.bottomRight,
-                  // add your floating action button
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.blue[800],
-                    onPressed: () {
-                      // print('Location recenter');
-                      // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
-                      _mapController.moveAndRotate(LatLng(widget.lat,widget.long), _zoom, 0.0);
-                    },
-                    child: Icon(MyFlutterApp.my_location)
-                  ),
-                ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
-              child: Align(
-                  alignment: Alignment.topRight,
-                  // add your floating action button
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.blue[800],
-                    onPressed: () {
-                      // print('Location recenter');
-                      // _mapController.move(LatLng(widget.lat,widget.long), _zoom);
-                      // _mapController.moveAndRotate(center, zoom, degree)
-                      _mapController.rotate(0);
-                    },
-                    child: Icon(Icons.north_rounded)
-                  ),
-                ),
-            ),
-           
+            // Column(
+            //   children: [
+            //     busLocationButton(),
+
+            //     NorthButton(),
+            //   ],
+            // ),
+            
+            bottomDetailsSheet(widget.busNo, widget.delay, recenterMethod(), NorthButtonBlue()),
+
             ],
           ),
         ),
       ),
     );
   }
+
+  Padding busLocationButton() {
+    return Padding(
+                padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
+                child: Align(
+                    alignment: Alignment.topRight,
+                    // Location Recenter
+                    child: recenterMethod(),
+                  ),
+              );
+  }
+
+  FloatingActionButton recenterMethod() {
+    return FloatingActionButton(
+                    backgroundColor: Colors.grey[300],
+                    foregroundColor: Colors.black,
+
+                    onPressed: () {
+                      _mapController.moveAndRotate(LatLng(widget.lat,widget.long), _zoom, 0.0);
+                    },
+                    child: Icon(MyFlutterApp.my_location)
+                  );
+  }
+
+  Padding NorthButton() {
+    return Padding(
+                padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
+                child: Align(
+                    alignment: Alignment.topRight,
+                    // add your floating action button
+                    child: NorthButtonBlue(),
+                  ),
+              );
+  }
+
+  FloatingActionButton NorthButtonBlue() {
+    return FloatingActionButton(
+                    backgroundColor: Colors.grey[300],
+                    foregroundColor: Colors.black,
+                    onPressed: () {
+                      
+                      _mapController.rotate(0);
+                    },
+                    child: Icon(Icons.north_rounded)
+                  );
+  }
+}
+
+DraggableScrollableController _DSController = DraggableScrollableController();
+
+/// Return the bottom widget with detals of bus and its position.
+Widget bottomDetailsSheet(String? busNo, int? delay, Widget busLocationButton, Widget NorthButton) {
+
+  TextStyle blackBoldTextStyle = TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+  );
+
+  ListTile customListTile(String title, String subtitle) {
+    return ListTile(
+      title: Text(
+        title,
+        style: blackBoldTextStyle,
+      ),
+      subtitle: Text(
+        subtitle,
+        style: blackBoldTextStyle,
+      ),
+    );
+  }
+
+
+  return DraggableScrollableSheet(
+    initialChildSize: .1,
+    minChildSize: .1,
+    maxChildSize: .3,
+    controller: _DSController,
+    builder: (BuildContext context, ScrollController scrollController) {
+      return Container(
+        // decoration: gradientBoxDecoration(),
+        // color: Colors.grey[300],
+        decoration: BoxDecoration(
+        // color:  Color.fromARGB(255, 160, 206, 207),
+        color: Colors.grey.shade300,
+        gradient:gradientColor(),
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(30),
+          topLeft: Radius.circular(30),
+          )
+      ),
+        child: ListView(
+          controller: scrollController,
+          children: [
+            draggableLine(),
+            SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                busLocationButton,
+                dragUpButton(_DSController, scrollController),
+                NorthButton
+              ],
+            ),
+            
+            customListTile("Last Updated", "${delay}s ago"),
+            customListTile("Bus Number", busNo.toString()),
+          ],
+        ),
+      );     
+    },
+  );
+}
+
+FloatingActionButton dragUpButton(DraggableScrollableController _DSController, ScrollController scrollController) {
+  return FloatingActionButton(
+                  backgroundColor: Colors.grey[300],
+                  foregroundColor: Colors.black,
+                  onPressed: () {
+                    _DSController.jumpTo(0.3);
+                  },
+                  child: Icon(Icons.keyboard_double_arrow_up)
+                );
+}
+
+BoxDecoration gradientBoxDecoration() {
+  return BoxDecoration(
+        color:  Colors.grey.shade300,
+        gradient:gradientColor(),
+        
+      );
+}
+
+LinearGradient gradientColor() {
+  return LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF37474F),
+            Color(0xFF1565C0),
+          ],
+        );
+}
+
+Column draggableLine() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    
+    children: [
+      Container(
+        width: 50,
+        height: 5,
+        decoration: BoxDecoration(
+          border: Border.all(),
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(20))
+        ),
+      )
+    ],
+  );
 }

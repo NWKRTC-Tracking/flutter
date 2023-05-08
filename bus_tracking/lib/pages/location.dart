@@ -32,10 +32,10 @@ class _LocationState extends State<Location> {
   late StreamController _locationController;
   double lat = 0, long = 0;
   int conductor_delay = 0, server_delay = 0, delay = 0, totalDelay = 0;
-  String message ="";
+  String message =""; // the error message sent by server
   bool _isDisposed = false;
   late String token;
-
+  
   Future fetchUser() async {
     final response = await http.get(Uri.parse(url+widget.apiKey));
     if (response.statusCode == 200) {
@@ -112,16 +112,22 @@ class _LocationState extends State<Location> {
                 print("Exception: ${snapshot.error}");
               }
               if (snapshot.hasData && message == "") {
-                // print('lat');
-                // print(lat);
-                return Column(
-                  children: <Widget>[
-                    displayMap(
-                      lat: lat,
-                      long: long,
-                      busNo: widget.busNo,
-                      delay : totalDelay
+                // The map is shown with latitude, longitude, delay, bus No
+                // if we get correct data.
+                return Stack(
+                  children: [
+                    Column(
+                      children: <Widget>[
+                        displayMap(
+                          lat: lat, 
+                          long: long,
+                          busNo: widget.busNo,
+                          delay : totalDelay, // totalDelay,
+                        ),
+                      ],
+
                     ),
+
                   ],
                 );
               }
