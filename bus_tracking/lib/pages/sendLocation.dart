@@ -608,62 +608,68 @@ class _sendLocationState extends State<sendLocation> {
 
   Widget buildFetchTrips(){
     return isFetching? CustomSpinnerWithTitle :Scaffold(
-      appBar: AppBar(
-      title: Text("NWKRTC"),
-      actions: [
-                FloatingActionButton.extended(onPressed: (){
-                  storage.deleteAll();
-                  timer?.cancel();
-                  Navigator.pushReplacementNamed(context, '/');
-                }, 
-                icon: Icon(Icons.logout,color: Colors.white,
-                ), 
-                label: Text('logout',style: TextStyle(color: Colors.white),))
-            ],
-      backgroundColor: Colors.blueGrey[800],
-      
-      ),
+      appBar: navBarWithLogout(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-         Center(
+         const Center(
            child: Text(
             "You don't have any Trips yet",
              style: TextStyle(fontSize: 18), 
           ),
          ),
-         SizedBox(height: 40,),
+         const SizedBox(height: 40,),
          Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          Text("Fetching agian in " , style: TextStyle(fontSize: 18), ),
-          Text("$fetchTripsIn", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
-          Text(" seconds",  style: TextStyle(fontSize: 18), ),
+          const Text("Fetching agian in " , style: TextStyle(fontSize: 18), ),
+          Text("$fetchTripsIn", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+          const Text(" seconds",  style: TextStyle(fontSize: 18), ),
           ],
          ),
-         SizedBox(height: 40,),
+        const SizedBox(height: 40,),
         ElevatedButton(onPressed: (){
           setState(() {
             fetchTripsIn = FetchFrequency;
             isFetching = true;
           });
           getTrips();
-        }, 
-        child: Icon(
+        },
+        style: ElevatedButton.styleFrom(
+          // backgroundColor: Colors.blue[800],
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(20),
+
+        ), 
+        child: const Icon(
           
           Icons.refresh_rounded,
           size: 40,
         ),
-        style: ElevatedButton.styleFrom(
-          primary: Colors.blue[800],
-          shape: CircleBorder(),
-          padding: EdgeInsets.all(20),
-
-        ),
         ) ,
         
       ]),
+    );
+  }
+
+  AppBar navBarWithLogout() {
+    return AppBar(
+    title: Text("NWKRTC"),
+    actions: [
+              FloatingActionButton.extended(
+                onPressed: (){
+                storage.deleteAll();
+                timer?.cancel();
+                Navigator.pushReplacementNamed(context, '/');
+              }, 
+              backgroundColor: Colors.blueGrey[700],
+              icon: Icon(Icons.logout,color: Colors.white,
+              ), 
+              label: Text('logout',style: TextStyle(color: Colors.white),))
+          ],
+    backgroundColor: Colors.blueGrey[800],
+    
     );
   }
 
@@ -678,28 +684,16 @@ class _sendLocationState extends State<sendLocation> {
     return WithForegroundTask(
       child: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.blueGrey[800],
-            title: Text('NWKRTC'),
-            actions: [
-                FloatingActionButton.extended(onPressed: (){
-                  _stopForegroundTask();
-                  storage.deleteAll();
-                  Navigator.pushReplacementNamed(context, '/');
-                }, 
-                // backgroundColor: Colors.blueGrey[900],
-                icon: Icon(Icons.logout,color: Colors.white,
-                ), 
-                label: Text('logout',style: TextStyle(color: Colors.white),))
-              ],
-          ),
+          appBar: navBarWithLogout(),
           body: Column(
       
             children: <Widget>[
               Offline(isOffline: isOffline),
               Expanded(
                 child: Center(
-                  child: ElevatedButton(onPressed:(){
+                  child: ElevatedButton(
+
+                    onPressed:(){
                       // isTripStarted ? _stopForegroundTask(): _startForegroundTask();
 
                       if(isTripStarted){
@@ -736,7 +730,8 @@ class _sendLocationState extends State<sendLocation> {
                   ),
                   
                   
-                    ),),
+                    ),
+                    ),
                   ),
             Expanded(
               child: ListView(children: <Widget>[  
