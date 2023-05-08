@@ -35,7 +35,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     initialRoute: "/",
     routes: {
-      "/": ((context) => HomePage()),
+      "/": ((context) => sendLocationCheck()),
       "/login" : ((context) => Login()),
       "/sendlocation": ((context) => sendLocationCheck()),
       '/resume-route': (context) => const ResumeRoutePage(),
