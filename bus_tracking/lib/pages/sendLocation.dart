@@ -33,6 +33,7 @@ void startCallback() {
 }
 
 
+// ignore: non_constant_identifier_names
 DraggableScrollableController DSController = DraggableScrollableController();
 
 class FirstTaskHandler extends TaskHandler {
@@ -45,7 +46,7 @@ class FirstTaskHandler extends TaskHandler {
   
 
   Future<Map> sendLocation(Map data , SendPort? sendPort) async {
-    int beforeSending =  DateTime.now().millisecondsSinceEpoch;
+    // int beforeSending =  DateTime.now().millisecondsSinceEpoch;
 
     print(data);
     var url = '${getUrl()}location';
@@ -113,7 +114,7 @@ class FirstTaskHandler extends TaskHandler {
 
 
       
-      print(data['time'] - data['start_time' ] + 31159359527 - 1200000 );
+      // print(data['time'] - data['start_time' ] + 31159359527 - 1200000 );
       // check if 15 hours have happend, if so delete the trip and stop the foreground service.
       if( data['time'] - data['start_time' ] > 54000000){
         sendPort?.send("15 hours over");
@@ -137,7 +138,7 @@ class FirstTaskHandler extends TaskHandler {
 
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
-    print("on event");
+    // print("on event");
 
 
   }
@@ -511,7 +512,7 @@ class _sendLocationState extends State<sendLocation> {
       // print("started get Trips timer");
       
       getTrips();
-      timer = Timer.periodic(Duration(seconds: 1), (Timer t) => getTripsTimer());
+      timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => getTripsTimer());
   }
 
   void readStorage(){
@@ -578,7 +579,7 @@ class _sendLocationState extends State<sendLocation> {
       _latLngList = [LatLng(15.342, 71.232)];
       setMarkers();
     });
-    timerLocation = Timer.periodic(Duration(milliseconds: 300), (Timer t) => getCurrentLocationOnMap());
+    timerLocation = Timer.periodic(const Duration(milliseconds: 300), (Timer t) => getCurrentLocationOnMap());
     
   }
   
@@ -633,7 +634,6 @@ class _sendLocationState extends State<sendLocation> {
   }
 
   void _storeTime()async{
-    // print('store time function');
       if(isTripStarted){
         var curTime = DateTime.now().millisecondsSinceEpoch;
         await storage.write(key: 'timeStamp',value: curTime.toString());
@@ -661,15 +661,13 @@ class _sendLocationState extends State<sendLocation> {
       child: Scaffold(
           appBar: navBarWithLogout(),
           body: SlidingUpPanel(
-            minHeight: 230,
             body: Stack(
               children:[
                  FlutterMapCustomWidget(mapController: _mapController, latLngList: _latLngList, zoom: _zoom, markers: _markers),
                 Column(
                   children: [
                     busLocationButton(),
-                    NorthButton(),
-
+                    northButton(),
                   ],
                 ),
               ]
@@ -681,9 +679,9 @@ class _sendLocationState extends State<sendLocation> {
     
   }
 
-  Padding NorthButton() {
+  Padding northButton() {
     return Padding(
-                padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
+                padding: const EdgeInsets.fromLTRB(0, 30, 20, 15),
                 child: Align(
                     alignment: Alignment.topRight,
                     // add your floating action button
@@ -700,13 +698,13 @@ class _sendLocationState extends State<sendLocation> {
                       
                       _mapController.rotate(0);
                     },
-                    child: Icon(Icons.north_rounded)
+                    child: const Icon(Icons.north_rounded)
                   );
   }
 
   Padding busLocationButton() {
     return Padding(
-                padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
+                padding: const EdgeInsets.fromLTRB(0, 15, 20, 30),
                 child: Align(
                     alignment: Alignment.topRight,
                     // Location Recenter
@@ -725,7 +723,7 @@ class _sendLocationState extends State<sendLocation> {
                       // We subtracted 0.3 because I don't want the current location to be on the centre of the page, 
                       // I want it a bit above.
                     },
-                    child: Icon(MyFlutterApp.my_location)
+                    child: const Icon(MyFlutterApp.my_location)
                   );
   }
 
@@ -777,7 +775,7 @@ class _sendLocationState extends State<sendLocation> {
 
   AppBar navBarWithLogout() {
     return AppBar(
-    title: Text("NWKRTC"),
+    title: const Text("NWKRTC"),
     actions: [
               FloatingActionButton.extended(
                 onPressed: (){
@@ -787,9 +785,9 @@ class _sendLocationState extends State<sendLocation> {
                 Navigator.pushReplacementNamed(context, '/');
               }, 
               backgroundColor: Colors.blueGrey[700],
-              icon: Icon(Icons.logout,color: Colors.white,
+              icon: const Icon(Icons.logout,color: Colors.white,
               ), 
-              label: Text('logout',style: TextStyle(color: Colors.white),))
+              label: const Text('logout',style: TextStyle(color: Colors.white),))
           ],
     backgroundColor: Colors.blueGrey[800],
     
@@ -806,25 +804,20 @@ class _sendLocationState extends State<sendLocation> {
   Widget buildSendLocation(){
     return WithForegroundTask(
       child: SafeArea(
-        child: Column(
-      
+        child: Column(      
             children: <Widget>[
-              draggableLine(),
-              Offline(isOffline: isOffline),
-              Expanded(
-                child: Center(
-                  child: startStopButton(),
-                    ),
-                  ),
+            Center(child: draggableLine()),
+            Center(child: Offline(isOffline: isOffline)),
+            startStopButton(),        
             Expanded(
               child: ListView(children: <Widget>[  
-            Center(
+            const Center(
                 child: Text(  
                   'Previous Sent data',  
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),  
                 )),  
             DataTable(  
-              columns: [
+              columns: const [
                 DataColumn(label: Text(  
                     '',  
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
@@ -843,8 +836,6 @@ class _sendLocationState extends State<sendLocation> {
             ),  
           ])  ,
             )
-            
-            
           ],
         ),
       ),
@@ -854,24 +845,24 @@ class _sendLocationState extends State<sendLocation> {
   ElevatedButton startStopButton() {
     return ElevatedButton(
 
-                  onPressed: startOrStopTrip,
-                 child:  Text(isTripStarted ? "STOP":"START", style: TextStyle(
-                  fontSize: 20,
-                ),
-                ),
+      onPressed: startOrStopTrip,
 
-                style: ElevatedButton.styleFrom(
-                  side: BorderSide(width: 10, color: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74)),
-                  // primary: Color.fromRGBO(0, 0, 0, 0.01),
-                  primary: Color.fromRGBO(255, 255, 255, 0.5),
-                  // shadowColor: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
-                  onPrimary: Colors.black,
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(60),
-                ),
+      style: ElevatedButton.styleFrom(
+        side: BorderSide(width: 10, color: isTripStarted ? const Color.fromARGB(255, 252, 111, 101): const Color.fromARGB(255, 69, 209, 74)),
+        backgroundColor: const Color.fromRGBO(255, 255, 255, 0.5),
+        foregroundColor:  Colors.black,
+        minimumSize: const Size.fromHeight(80),
+      ),
+      child:  Text(
+        isTripStarted ? "STOP SENDING":"START SENDING", 
+        
+        style: const TextStyle(
+        fontSize: 20,
+      ),
+      ),
                 
                 
-                  );
+    );
   }
 
   void startOrStopTrip(){
@@ -898,11 +889,11 @@ class _sendLocationState extends State<sendLocation> {
     return DataRow(cells: [  
                 DataCell(Text(
                   label,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal)  
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal)  
                   )),
                 DataCell(Text(
                   value,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
                 )),   
               ]);
   }
