@@ -12,6 +12,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import'../presentation/my_flutter_app_icons.dart';
 import'../presentation/BusLocation.dart';
+import './flutterMapCustomWidget.dart';
 
 class displayMap extends StatefulWidget {
   double lat, long;
@@ -65,14 +66,7 @@ class _displayMapState extends State<displayMap> {
                   point: pointe,
                   width: 60,
                   height: 60,
-                  // builder: (context) => const Icon(
-                  //   MyFlutterApp.location_on,
-                  //   // Icons.bus_alert_outlined,
-                  //   // ImageIcon(AssetImage('assets/bus.png')) ,
-                  //   size: 60,
-                  //   shadows: <Shadow>[Shadow(color: Colors.black, blurRadius: 1.0)],
-                  //   color: Colors.black,
-                  // ),
+
                   builder: (context) => const ImageIcon(
                       AssetImage("assets/images/bus.png"),
                       color: Colors.black,
@@ -100,7 +94,7 @@ class _displayMapState extends State<displayMap> {
           appBar: AppBar(
             elevation: 5,
           //  toolbarHeight: 30,
-            // backgroundColor: widget.delay < 300 ? Color.fromARGB(255, 225, 245, 255) : Colors.red[400],
+            backgroundColor: widget.delay < 300 ? Color.fromARGB(255, 225, 245, 255) : Colors.red[400],
             flexibleSpace: Container(
               decoration: gradientBoxDecoration()
             ),
@@ -109,61 +103,7 @@ class _displayMapState extends State<displayMap> {
           ),
           body: Stack(
             children: <Widget>[
-            FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                maxZoom: 18,
-                minZoom: 4,
-                center: _latLngList.elementAt(0),
-                bounds: LatLngBounds.fromPoints(_latLngList),
-                zoom: _zoom,
-                interactiveFlags: InteractiveFlag.all,
-                plugins: [
-                  MarkerClusterPlugin(),
-                ],
-              ),
-              layers: [
-                TileLayerOptions(
-                  minZoom: 2,
-                  maxZoom: 25,
-                
-                  backgroundColor: Colors.black,
-                  // errorImage: ,
-                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                MarkerClusterLayerOptions(
-                  maxClusterRadius: 190,
-                  disableClusteringAtZoom: 16,
-                  size: const Size(50, 50),
-                  
-                  fitBoundsOptions: const FitBoundsOptions(
-                    padding: EdgeInsets.all(50),
-                  
-                  ),
-                  markers: _markers,
-                  // polygonOptions: const PolygonOptions(
-                  //     borderColor: Colors.blueAccent,
-                  //     color: Colors.black12,
-                  //     borderStrokeWidth: 3),
-                  builder: (context, markers) {
-                    return Container(
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                          color: Colors.orange, shape: BoxShape.circle),
-                      child: Text('${markers.length}'),
-                    );
-                  },
-                ),
-              ],
-            ),
-            // Column(
-            //   children: [
-            //     busLocationButton(),
-
-            //     NorthButton(),
-            //   ],
-            // ),
+            FlutterMapCustomWidget(mapController: _mapController, latLngList: _latLngList, zoom: _zoom, markers: _markers),
             
             bottomDetailsSheet(widget.busNo, widget.delay, recenterMethod(), NorthButtonBlue()),
 
@@ -325,7 +265,7 @@ Column draggableLine() {
     children: [
       Container(
         width: 50,
-        height: 5,
+        height: 4,
         decoration: BoxDecoration(
           border: Border.all(),
           color: Colors.white,

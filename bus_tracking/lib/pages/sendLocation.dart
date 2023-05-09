@@ -6,6 +6,7 @@ import 'dart:isolate';
 import 'package:bus_tracking/main.dart';
 import 'package:bus_tracking/models/offline.dart';
 import 'package:bus_tracking/models/spinner.dart';
+import 'package:bus_tracking/services/flutterMapCustomWidget.dart';
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/key.dart';
@@ -16,6 +17,14 @@ import 'package:bus_tracking/config/url.dart';
 import 'package:intl/intl.dart';
 import 'package:android_intent_plus/android_intent.dart';
 
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:bus_tracking/presentation/my_flutter_app_icons.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/plugin_api.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+
+import '../services/displayMap.dart';
+
 
 @pragma('vm:entry-point')
 void startCallback() {
@@ -23,10 +32,8 @@ void startCallback() {
   FlutterForegroundTask.setTaskHandler(FirstTaskHandler());
 }
 
-// double latitude = 0.0, longitude = 0.0;
-// StreamController<double> controllerLat = StreamController<double>();
 
-// StreamController<double> controllerLong  = StreamController<double>();
+DraggableScrollableController DSController = DraggableScrollableController();
 
 class FirstTaskHandler extends TaskHandler {
 
@@ -45,12 +52,6 @@ class FirstTaskHandler extends TaskHandler {
     //encode Map to JSON
     var body = json.encode(data);
 
-    // data['statusCode'] = 200;
-    // data['lastSentTime'] = DateTime.now().millisecondsSinceEpoch;
-    
-    // try {
-
-    //   print(data);
       try {
           var response = await http.post(Uri.parse(url),
           headers: {"Content-Type": "application/json", "Authorization":"Bearer $token"}, body: body);
@@ -205,7 +206,14 @@ class _sendLocationState extends State<sendLocation> {
   bool isTripStarted = false, isTripThere = false, isFetching = false, isOffline = false;
   String? token, phoneNo, jwt, busNo;
   Timer? timer;
+  Timer? timerLocation;
   ReceivePort? _receivePort;
+  final PopupController _popupController = PopupController();
+  MapController _mapController = MapController();
+  final double _zoom = 10;
+
+  List<LatLng> _latLngList = [];
+  List<Marker> _markers = [];
 
 
 
@@ -414,10 +422,7 @@ class _sendLocationState extends State<sendLocation> {
         print('message');
         print(message);
 
-
-
         if(message is Map){
-
           if(message['statusCode'] == 200){
             setState(() {
               isOffline = false;
@@ -446,7 +451,6 @@ class _sendLocationState extends State<sendLocation> {
             Navigator.of(context).pushNamed('/resume-route');
           }
           if(message == "15 hours over"){
-
             setState(() {
               isTripThere = false;
               isTripStarted = false;
@@ -463,7 +467,6 @@ class _sendLocationState extends State<sendLocation> {
             });
             startgetTripsTimer();
           }
-
         }
         else if(message is Type){
           if(message.toString() == '_ClientSocketException'){
@@ -477,7 +480,7 @@ class _sendLocationState extends State<sendLocation> {
 
       return true;
     }
-    print('no recieve port');
+    // print('no recieve port');
     return false;
   }
 
@@ -497,8 +500,7 @@ class _sendLocationState extends State<sendLocation> {
         setState(() {
           jwt = value;
         });
-        print("jwt");
-        print(jwt);
+        
         var jwtspit = jwt!.split(".");
         var payload = json.decode(ascii.decode(base64.decode(base64.normalize(jwtspit[1]))));
         print(payload);
@@ -506,20 +508,13 @@ class _sendLocationState extends State<sendLocation> {
           phoneNo = payload['sub']; 
         });
       });
-      print("started get Trips timer");
+      // print("started get Trips timer");
       
       getTrips();
       timer = Timer.periodic(Duration(seconds: 1), (Timer t) => getTripsTimer());
   }
-  
 
-  @override
-  void initState() {
-    _checkAndRequestPermission();
-    super.initState();
-
-   
-
+  void readStorage(){
     storage.read(key: "tripId").then((value){
       if(value != null){
         setState(() {
@@ -541,7 +536,6 @@ class _sendLocationState extends State<sendLocation> {
       });
       }
     });
-
     storage.read(key: "lastSentTime").then((value){
       if(value!= null){
         setState(() {
@@ -549,6 +543,16 @@ class _sendLocationState extends State<sendLocation> {
         });
       }
     });
+  }
+
+  late AnchorPos<dynamic> anchorPos;
+  bool isFirstTimeGotCurrentLocation = true;
+
+  @override
+  void initState() {
+    _checkAndRequestPermission();
+    super.initState();
+    readStorage();
 
     _initForegroundTask();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -568,6 +572,64 @@ class _sendLocationState extends State<sendLocation> {
       startgetTripsTimer();
     }
 
+    // Initialize the map and start getting the current location of mobile.
+    anchorPos = AnchorPos.align(AnchorAlign.top);
+    setState(() {
+      _latLngList = [LatLng(15.342, 71.232)];
+      setMarkers();
+    });
+    timerLocation = Timer.periodic(Duration(milliseconds: 300), (Timer t) => getCurrentLocationOnMap());
+    
+  }
+  
+ 
+  void getCurrentLocationOnMap() {
+    // Gets the current location of the device and updates it.
+
+    FlLocation.getLocation().then((loc)
+    {
+      setNewLocation(loc.latitude, loc.longitude);
+
+      // If we got the location for the first time, we need to recenter. 
+      // This is because we have to set an initial dummy location so we don't get
+      // an error before this runs.
+      if(isFirstTimeGotCurrentLocation){
+        _mapController.moveAndRotate(LatLng(loc.latitude, loc.longitude), _zoom, 0);
+
+      }
+      isFirstTimeGotCurrentLocation = false;
+    }
+    );
+  }
+
+  void setNewLocation(double lat, double long) {
+    /// Sets the _latLngList to the location which we gave
+    /// 
+    /// Can be problamatic if we need to change many locations in the list.
+    return setState(() {
+      _latLngList = [LatLng(lat, long )];
+      setMarkers();
+      
+    });
+  }
+
+  void setMarkers() {
+    /// sets the marker as bus's icon for each element in _latLngList.
+    _markers = _latLngList
+    .map((pointe) => Marker(
+              point: pointe,
+              width: 60,
+              height: 60,
+              builder: (context) => const ImageIcon(
+                  AssetImage("assets/images/bus.png"),
+                  color: Colors.black,
+                  size: 60,
+                  
+              ),
+              anchorPos: anchorPos
+              
+            ))
+        .toList();
   }
 
   void _storeTime()async{
@@ -585,34 +647,95 @@ class _sendLocationState extends State<sendLocation> {
   void dispose() {
     _closeReceivePort();
     timer?.cancel();
+    timerLocation?.cancel(); // Need to cancel the getting location to show on the screen.
     super.dispose();
-    // streamLat.cancel();
+
   }
 
   late Stream stream;
-  // double lat  = 0 , long = 0;
-  // StreamSubscription<double>? _streamSubscriptionLoc;
-  // Stream stream = controllerLat.stream;
-  
-  // stream.listen((value){
-  //   print(value);
-  // })
 
-    
-  
 
   @override
   Widget build(BuildContext context) {
-    return isTripThere ? buildSendLocation() : buildFetchTrips();
+    return SafeArea(
+      child: Scaffold(
+          appBar: navBarWithLogout(),
+          body: SlidingUpPanel(
+            minHeight: 230,
+            body: Stack(
+              children:[
+                 FlutterMapCustomWidget(mapController: _mapController, latLngList: _latLngList, zoom: _zoom, markers: _markers),
+                Column(
+                  children: [
+                    busLocationButton(),
+                    NorthButton(),
+
+                  ],
+                ),
+              ]
+              ),
+            panel: isTripThere ? buildSendLocation() : buildFetchTrips(),
+          )
+      )
+    );
+    
+  }
+
+  Padding NorthButton() {
+    return Padding(
+                padding: EdgeInsets.fromLTRB(0, 30, 20, 15),
+                child: Align(
+                    alignment: Alignment.topRight,
+                    // add your floating action button
+                    child: NorthButtonBlue(),
+                  ),
+              );
+  }
+
+  FloatingActionButton NorthButtonBlue() {
+    return FloatingActionButton(
+                    backgroundColor: Colors.grey[300],
+                    foregroundColor: Colors.black,
+                    onPressed: () {
+                      
+                      _mapController.rotate(0);
+                    },
+                    child: Icon(Icons.north_rounded)
+                  );
+  }
+
+  Padding busLocationButton() {
+    return Padding(
+                padding: EdgeInsets.fromLTRB(0, 15, 20, 30),
+                child: Align(
+                    alignment: Alignment.topRight,
+                    // Location Recenter
+                    child: recenterMethod(),
+                  ),
+              );
+  }
+
+  FloatingActionButton recenterMethod() {
+    return FloatingActionButton(
+                    backgroundColor: Colors.grey[300],
+                    foregroundColor: Colors.black,
+
+                    onPressed: () {
+                      _mapController.moveAndRotate(LatLng(_latLngList[0].latitude - 3/_zoom, _latLngList[0].longitude), _zoom, 0.0);
+                      // We subtracted 0.3 because I don't want the current location to be on the centre of the page, 
+                      // I want it a bit above.
+                    },
+                    child: Icon(MyFlutterApp.my_location)
+                  );
   }
 
   Widget buildFetchTrips(){
-    return isFetching? CustomSpinnerWithTitle :Scaffold(
-      appBar: navBarWithLogout(),
-      body: Column(
+    return isFetching? CustomSpinner : Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          draggableLine(),
+        
          const Center(
            child: Text(
             "You don't have any Trips yet",
@@ -649,8 +772,7 @@ class _sendLocationState extends State<sendLocation> {
         ),
         ) ,
         
-      ]),
-    );
+      ]);
   }
 
   AppBar navBarWithLogout() {
@@ -661,6 +783,7 @@ class _sendLocationState extends State<sendLocation> {
                 onPressed: (){
                 storage.deleteAll();
                 timer?.cancel();
+                timerLocation?.cancel();
                 Navigator.pushReplacementNamed(context, '/');
               }, 
               backgroundColor: Colors.blueGrey[700],
@@ -683,54 +806,14 @@ class _sendLocationState extends State<sendLocation> {
   Widget buildSendLocation(){
     return WithForegroundTask(
       child: SafeArea(
-        child: Scaffold(
-          appBar: navBarWithLogout(),
-          body: Column(
+        child: Column(
       
             children: <Widget>[
+              draggableLine(),
               Offline(isOffline: isOffline),
               Expanded(
                 child: Center(
-                  child: ElevatedButton(
-
-                    onPressed:(){
-                      // isTripStarted ? _stopForegroundTask(): _startForegroundTask();
-
-                      if(isTripStarted){
-                        _stopForegroundTask();
-                        setState(() {
-                          isTripStarted = !isTripStarted;
-                        });
-                      }
-                      else{
-                        _startForegroundTask().then((value){
-                            if(value){
-                              setState(() {
-                                isTripStarted = !isTripStarted;
-                              });
-                            }
-                            
-                        });
-                      }
-                
-                      _storeTime();
-                    },
-                   child:  Text(isTripStarted ? "STOP":"START", style: TextStyle(
-                    fontSize: 40,
-                  ),),
-
-                  style: ElevatedButton.styleFrom(
-                    side: BorderSide(width: 10, color: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74)),
-                    // primary: Color.fromRGBO(0, 0, 0, 0.01),
-                    primary: Color.fromRGBO(255, 255, 255, 0.5),
-                    // shadowColor: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
-                    onPrimary: Colors.black,
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(80),
-                  ),
-                  
-                  
-                    ),
+                  child: startStopButton(),
                     ),
                   ),
             Expanded(
@@ -765,8 +848,50 @@ class _sendLocationState extends State<sendLocation> {
           ],
         ),
       ),
-     )
-    );
+     );
+  }
+
+  ElevatedButton startStopButton() {
+    return ElevatedButton(
+
+                  onPressed: startOrStopTrip,
+                 child:  Text(isTripStarted ? "STOP":"START", style: TextStyle(
+                  fontSize: 20,
+                ),
+                ),
+
+                style: ElevatedButton.styleFrom(
+                  side: BorderSide(width: 10, color: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74)),
+                  // primary: Color.fromRGBO(0, 0, 0, 0.01),
+                  primary: Color.fromRGBO(255, 255, 255, 0.5),
+                  // shadowColor: isTripStarted ? Color.fromARGB(255, 252, 111, 101): Color.fromARGB(255, 69, 209, 74),
+                  onPrimary: Colors.black,
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(60),
+                ),
+                
+                
+                  );
+  }
+
+  void startOrStopTrip(){
+    if(isTripStarted){
+      _stopForegroundTask();
+      setState(() {
+        isTripStarted = !isTripStarted;
+      });
+    }
+    else{
+      _startForegroundTask().then((value){
+          if(value){
+            setState(() {
+              isTripStarted = !isTripStarted;
+            });
+          }
+      });
+    }
+    _storeTime();
+  
   }
 
   DataRow datarow(String label,String value) {
