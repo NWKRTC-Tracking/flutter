@@ -844,25 +844,36 @@ class _sendLocationState extends State<sendLocation> {
 
   ElevatedButton startStopButton() {
     return ElevatedButton(
-
       onPressed: startOrStopTrip,
-
       style: ElevatedButton.styleFrom(
-        side: BorderSide(width: 10, color: isTripStarted ? const Color.fromARGB(255, 252, 111, 101): const Color.fromARGB(255, 69, 209, 74)),
-        backgroundColor: const Color.fromRGBO(255, 255, 255, 0.5),
-        foregroundColor:  Colors.black,
+        side: BorderSide(
+          width: 10,
+          color: isTripStarted ? const Color.fromARGB(255, 252, 111, 101): const Color.fromARGB(255, 69, 209, 74)
+        ),
         minimumSize: const Size.fromHeight(80),
-      ),
-      child:  Text(
-        isTripStarted ? "STOP SENDING":"START SENDING", 
         
-        style: const TextStyle(
-        fontSize: 20,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+
+        backgroundColor: isTripStarted ? const Color.fromARGB(255, 252, 111, 101): const Color.fromARGB(255, 69, 209, 74),
+        foregroundColor:  Colors.black,
       ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Color.fromRGBO(255, 255, 255, 0.5)
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Text(
+          isTripStarted ? "STOP SENDING":"START SENDING",
+          style: const TextStyle(
+            fontSize: 20,
+          ),
+        ),
       ),
-                
-                
     );
+
   }
 
   void startOrStopTrip(){
